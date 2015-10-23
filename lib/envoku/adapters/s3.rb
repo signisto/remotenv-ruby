@@ -15,6 +15,7 @@ module Envoku
 
       def load
         Dotenv.load
+        return if credentials.nil?
         FileUtils.rm @local_file_name if File.exists? @local_file_name
         return unless clone_s3_file
         Dotenv.load @local_file_name
@@ -51,7 +52,7 @@ module Envoku
             access_key_id: @options[:access_key_id] || ENV['ENVOKU_ACCESS_KEY_ID'] || ENV['AWS_ACCESS_KEY_ID'],
             secret_access_key: @options[:secret_access_key] || ENV['ENVOKU_SECRET_ACCESS_KEY'] || ENV['AWS_SECRET_ACCESS_KEY'],
           )
-          raise "Credentials not supplied" unless _.to_h.keys.all? { |k| _.send(k) != "" && _.send(k) != nil }
+          return nil unless _.to_h.keys.all? { |k| _.send(k) != "" && _.send(k) != nil }
           _
         end
       end

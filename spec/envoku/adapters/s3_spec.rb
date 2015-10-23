@@ -17,12 +17,24 @@ describe Envoku::Adapters::S3 do
   end
 
   describe "#load" do
+    context "when credentials are missing" do
+      it "loads dotenv then skips" do
+        instance = Envoku::Adapters::S3.new
+        expect(Dotenv).to receive(:load).with(no_args)
+        expect(instance).to receive(:credentials).and_return nil
+        expect(FileUtils).not_to receive(:rm)
+        expect(instance).not_to receive(:clone_s3_file)
+        instance.load
+        expect(ENV['ENVOKU_REFRESHED_AT']).to be nil
+      end
+    end
     context "when file clones correctly" do
       it "loads the environment" do
         local_file_name = "/tmp/envoku-test.env"
         instance = Envoku::Adapters::S3.new
         instance.instance_variable_set :'@local_file_name', local_file_name
         expect(Dotenv).to receive(:load).with(no_args)
+        expect(instance).to receive(:credentials).and_return(bucket: 'test')
         expect(instance).to receive(:clone_s3_file).and_return true
         expect(Dotenv).to receive(:load).with(local_file_name)
         expect(FileUtils).to receive(:rm).with(local_file_name)
@@ -36,6 +48,7 @@ describe Envoku::Adapters::S3 do
         instance = Envoku::Adapters::S3.new
         instance.instance_variable_set :'@local_file_name', local_file_name
         expect(Dotenv).to receive(:load).with(no_args)
+        expect(instance).to receive(:credentials).and_return(bucket: 'test')
         expect(instance).to receive(:clone_s3_file).and_return false
         expect(Dotenv).not_to receive(:load)
         expect(FileUtils).not_to receive(:rm)
@@ -59,9 +72,8 @@ describe Envoku::Adapters::S3 do
     let(:instance) { Envoku::Adapters::S3.new }
     context "when no keys are set" do
       it "raises an exception" do
-        expect {
-          instance.send(:credentials)
-        }.to raise_error "Credentials not supplied"
+        credentials = instance.send(:credentials)
+        expect(credentials).to be nil
       end
     end
     context "when default AWS keys are set" do
