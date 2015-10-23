@@ -8,6 +8,6 @@ module Envoku
 
   def load options = {}
     instance = Envoku::Adapters::S3.new options
-    instance.load!
+    instance.load
   end
 end
