@@ -8,6 +8,7 @@ Gem::Specification.new do |spec|
   spec.version       = Envoku::VERSION
   spec.authors       = ["Marc Qualie"]
   spec.email         = ["marc@marcqualie.com"]
+  spec.licenses      = ['MIT']
 
   spec.summary       = "Store environment variables securely on S3 away from your application"
   spec.homepage      = "https://envoku.com"
