@@ -5,7 +5,12 @@ require 'envoku'
 RSpec.configure do |config|
 
   config.before :each do
-    ENV.keys.each { |k| ENV.delete k }
+    [
+      'AWS_ACCESS_KEY_ID',
+      'AWS_SECRET_ACCESS_KEY',
+      'ENVOKU_BUCKET',
+      'ENVOKU_REFRESHED_AT',
+    ].each { |key| ENV.delete(key) }
   end
 
 end
