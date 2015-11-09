@@ -4,6 +4,7 @@ require 'fileutils'
 require 'net/http'
 require 'ostruct'
 require 'securerandom'
+require 'base64'
 
 module Envoku
   module Adapters
