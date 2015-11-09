@@ -29,7 +29,7 @@ module Envoku
         s3_file_name = @options[:filename] || ENV['ENVOKU_FILENAME'] || "#{Rails.env}.env"
         s3_direct_url = "https://#{credentials.bucket_name}.s3.amazonaws.com/#{s3_file_name}"
         s3_resource = "/#{credentials.bucket_name}/#{s3_file_name}"
-        s3_expires_at = DateTime.now + 5.minutes
+        s3_expires_at = Time.now + 300
         signature_payload = "GET\n\n\n#{s3_expires_at.to_i}\n#{s3_resource}"
         digest = OpenSSL::Digest.new 'sha1'
         hmac = OpenSSL::HMAC.digest digest, credentials.secret_access_key, signature_payload
