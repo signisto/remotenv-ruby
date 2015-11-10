@@ -10,6 +10,7 @@ RSpec.configure do |config|
       'AWS_SECRET_ACCESS_KEY',
       'ENVOKU_BUCKET',
       'ENVOKU_REFRESHED_AT',
+      'ENVOKU_URL',
     ].each { |key| ENV.delete(key) }
   end
 

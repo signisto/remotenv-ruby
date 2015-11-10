@@ -69,43 +69,91 @@ describe Envoku::Adapters::S3 do
       ENV['ENVOKU_ACCESS_KEY_ID'] = "ENVOKU_ACCESS_KEY_ID"
       ENV['ENVOKU_SECRET_ACCESS_KEY'] = "ENVOKU_SECRET_ACCESS_KEY"
     end
+    def set_invalid_envoku_url
+      ENV['ENVOKU_URL'] = "s3.amazonaws.com/bucket-name"
+    end
+    def set_valid_envoku_url
+      ENV['ENVOKU_URL'] = "s3://URL_ACCESS_KEY_ID:URL_SECRET_ACCES_KEY@url-bucket-name/url-filename.env"
+    end
     let(:instance) { Envoku::Adapters::S3.new }
-    context "when no keys are set" do
-      it "raises an exception" do
-        credentials = instance.send(:credentials)
-        expect(credentials).to be nil
+
+    context "when ENVOKU_URL is not set" do
+      context "when no keys are set" do
+        it "returns no credentials" do
+          credentials = instance.send(:credentials)
+          expect(credentials).to be nil
+        end
+      end
+      context "when default AWS keys are set" do
+        it "uses default keys" do
+          set_default_aws_keys
+          credentials = instance.send(:credentials)
+          expect(credentials.access_key_id).to eq "AWS_ACCESS_KEY_ID"
+          expect(credentials.secret_access_key).to eq "AWS_SECRET_ACCESS_KEY"
+        end
+      end
+      context "when Envoku AWS keys are set" do
+        it "overrides default keys" do
+          set_default_aws_keys
+          set_envoku_aws_keys
+          credentials = instance.send(:credentials)
+          expect(credentials.access_key_id).to eq "ENVOKU_ACCESS_KEY_ID"
+          expect(credentials.secret_access_key).to eq "ENVOKU_SECRET_ACCESS_KEY"
+        end
+      end
+      context "when options are passed" do
+        it "overrides default and envoku keys" do
+          set_default_aws_keys
+          set_envoku_aws_keys
+          instance = Envoku::Adapters::S3.new(
+            bucket: 'test-bucket',
+            access_key_id: 'test-access-key-id',
+            secret_access_key: 'test-secret-access-key',
+          )
+          credentials = instance.send(:credentials)
+          expect(credentials.bucket_name).to eq 'test-bucket'
+          expect(credentials.access_key_id).to eq "test-access-key-id"
+          expect(credentials.secret_access_key).to eq "test-secret-access-key"
+        end
       end
     end
-    context "when default AWS keys are set" do
-      it "uses default keys" do
-        set_default_aws_keys
-        credentials = instance.send(:credentials)
-        expect(credentials.access_key_id).to eq "AWS_ACCESS_KEY_ID"
-        expect(credentials.secret_access_key).to eq "AWS_SECRET_ACCESS_KEY"
+
+    context "when ENVOKU_URL is set" do
+      context "when URL is valid" do
+        it "returns no credentials" do
+          set_default_aws_keys
+          set_envoku_aws_keys
+          set_invalid_envoku_url
+          credentials = instance.send(:credentials)
+          expect(credentials).to eq nil
+        end
       end
-    end
-    context "when default AWS keys are set" do
-      it "overrides default keys" do
-        set_default_aws_keys
-        set_envoku_aws_keys
-        credentials = instance.send(:credentials)
-        expect(credentials.access_key_id).to eq "ENVOKU_ACCESS_KEY_ID"
-        expect(credentials.secret_access_key).to eq "ENVOKU_SECRET_ACCESS_KEY"
+      context "when URL is valid" do
+        it "overrides all other keys" do
+          set_default_aws_keys
+          set_envoku_aws_keys
+          set_valid_envoku_url
+          credentials = instance.send(:credentials)
+          expect(credentials.bucket_name).to eq 'url-bucket-name'
+          expect(credentials.access_key_id).to eq "URL_ACCESS_KEY_ID"
+          expect(credentials.secret_access_key).to eq "URL_SECRET_ACCES_KEY"
+        end
       end
-    end
-    context "when options are passed" do
-      it "overrides default and envoku keys" do
-        set_default_aws_keys
-        set_envoku_aws_keys
-        instance = Envoku::Adapters::S3.new(
-          bucket: 'test-bucket',
-          access_key_id: 'test-access-key-id',
-          secret_access_key: 'test-secret-access-key',
-        )
-        credentials = instance.send(:credentials)
-        expect(credentials.bucket_name).to eq 'test-bucket'
-        expect(credentials.access_key_id).to eq "test-access-key-id"
-        expect(credentials.secret_access_key).to eq "test-secret-access-key"
+      context "when options are passed" do
+        it "overrides ENVOKU_URL keys" do
+          set_default_aws_keys
+          set_envoku_aws_keys
+          set_valid_envoku_url
+          instance = Envoku::Adapters::S3.new(
+            bucket: 'test-bucket',
+            access_key_id: 'test-access-key-id',
+            secret_access_key: 'test-secret-access-key',
+          )
+          credentials = instance.send(:credentials)
+          expect(credentials.bucket_name).to eq 'test-bucket'
+          expect(credentials.access_key_id).to eq "test-access-key-id"
+          expect(credentials.secret_access_key).to eq "test-secret-access-key"
+        end
       end
     end
   end

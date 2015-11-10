@@ -48,11 +48,24 @@ module Envoku
 
       def credentials
         @credentials ||= begin
-          _ = OpenStruct.new(
-            bucket_name: @options[:bucket] || ENV['ENVOKU_BUCKET'],
-            access_key_id: @options[:access_key_id] || ENV['ENVOKU_ACCESS_KEY_ID'] || ENV['AWS_ACCESS_KEY_ID'],
-            secret_access_key: @options[:secret_access_key] || ENV['ENVOKU_SECRET_ACCESS_KEY'] || ENV['AWS_SECRET_ACCESS_KEY'],
-          )
+          if ENV['ENVOKU_URL']
+            envoku_uri = URI.parse(ENV['ENVOKU_URL'])
+            return nil unless envoku_uri.host && envoku_uri.path
+            _ = OpenStruct.new(
+              bucket_name: envoku_uri.host,
+              access_key_id: envoku_uri.user,
+              secret_access_key: envoku_uri.password,
+            )
+          else
+            _ = OpenStruct.new(
+              bucket_name: ENV['ENVOKU_BUCKET'],
+              access_key_id: ENV['ENVOKU_ACCESS_KEY_ID'] || ENV['AWS_ACCESS_KEY_ID'],
+              secret_access_key: ENV['ENVOKU_SECRET_ACCESS_KEY'] || ENV['AWS_SECRET_ACCESS_KEY'],
+            )
+          end
+          _.bucket_name = @options[:bucket] if @options.has_key? :bucket
+          _.access_key_id = @options[:access_key_id] if @options.has_key? :access_key_id
+          _.secret_access_key = @options[:secret_access_key] if @options.has_key? :secret_access_key
           return nil unless _.to_h.keys.all? { |k| _.send(k) != "" && _.send(k) != nil }
           _
         end
