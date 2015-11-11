@@ -6,22 +6,32 @@ describe Envoku::Adapters::S3 do
 
   describe "#initialize" do
     it "sets options variable" do
-      options = { test: 1 }
+      options = { test: 1, bucket_name: 'test' }
       instance = Envoku::Adapters::S3.new options
-      expect(instance.instance_variable_get :'@options').to eq options
+      expect(instance.instance_variable_get :'@options').to eq OpenStruct.new(
+        test: 1,
+        filename: nil,
+        bucket_name: 'test',
+        access_key_id: nil,
+        secret_access_key: nil,
+      )
     end
     it "sets local_file_name variable" do
       instance = Envoku::Adapters::S3.new
       expect(instance.instance_variable_get :'@local_file_name').not_to be nil
     end
+    it "calls apply_environment_options" do
+      expect_any_instance_of(Envoku::Adapters::S3).to receive(:apply_environment_options)
+      Envoku::Adapters::S3.new
+    end
   end
 
   describe "#load" do
-    context "when credentials are missing" do
+    context "when options are missing" do
       it "loads dotenv then skips" do
         instance = Envoku::Adapters::S3.new
         expect(Dotenv).to receive(:load).with(no_args)
-        expect(instance).to receive(:credentials).and_return nil
+        expect(instance).to receive(:options).and_return OpenStruct.new
         expect(FileUtils).not_to receive(:rm)
         expect(instance).not_to receive(:clone_s3_file)
         instance.load
@@ -34,7 +44,7 @@ describe Envoku::Adapters::S3 do
         instance = Envoku::Adapters::S3.new
         instance.instance_variable_set :'@local_file_name', local_file_name
         expect(Dotenv).to receive(:load).with(no_args)
-        expect(instance).to receive(:credentials).and_return(bucket: 'test')
+        expect(instance).to receive(:options).at_least(:once).and_return(OpenStruct.new bucket_name: 'test', filename: 'test.env', access_key_id: 'XXX', secret_access_key: 'XXXXX')
         expect(instance).to receive(:clone_s3_file).and_return true
         expect(Dotenv).to receive(:load).with(local_file_name)
         expect(FileUtils).to receive(:rm).with(local_file_name)
@@ -48,7 +58,7 @@ describe Envoku::Adapters::S3 do
         instance = Envoku::Adapters::S3.new
         instance.instance_variable_set :'@local_file_name', local_file_name
         expect(Dotenv).to receive(:load).with(no_args)
-        expect(instance).to receive(:credentials).and_return(bucket: 'test')
+        expect(instance).to receive(:options).at_least(:once).and_return(OpenStruct.new bucket_name: 'test', filename: 'test.env', access_key_id: 'XXX', secret_access_key: 'XXXXX')
         expect(instance).to receive(:clone_s3_file).and_return false
         expect(Dotenv).not_to receive(:load)
         expect(FileUtils).not_to receive(:rm)
@@ -58,7 +68,7 @@ describe Envoku::Adapters::S3 do
     end
   end
 
-  describe "#credentials" do
+  describe "#options" do
     def set_default_aws_keys
       ENV['ENVOKU_BUCKET'] = "ENVOKU_BUCKET"
       ENV['AWS_ACCESS_KEY_ID'] = "AWS_ACCESS_KEY_ID"
@@ -79,26 +89,26 @@ describe Envoku::Adapters::S3 do
 
     context "when ENVOKU_URL is not set" do
       context "when no keys are set" do
-        it "returns no credentials" do
-          credentials = instance.send(:credentials)
-          expect(credentials).to be nil
+        it "returns no options" do
+          instance.send(:apply_environment_options)
+          expect(instance.options).to eq OpenStruct.new(filename: nil, bucket_name: nil, access_key_id: nil, secret_access_key: nil)
         end
       end
       context "when default AWS keys are set" do
         it "uses default keys" do
           set_default_aws_keys
-          credentials = instance.send(:credentials)
-          expect(credentials.access_key_id).to eq "AWS_ACCESS_KEY_ID"
-          expect(credentials.secret_access_key).to eq "AWS_SECRET_ACCESS_KEY"
+          instance.send(:apply_environment_options)
+          expect(instance.options.access_key_id).to eq "AWS_ACCESS_KEY_ID"
+          expect(instance.options.secret_access_key).to eq "AWS_SECRET_ACCESS_KEY"
         end
       end
       context "when Envoku AWS keys are set" do
         it "overrides default keys" do
           set_default_aws_keys
           set_envoku_aws_keys
-          credentials = instance.send(:credentials)
-          expect(credentials.access_key_id).to eq "ENVOKU_ACCESS_KEY_ID"
-          expect(credentials.secret_access_key).to eq "ENVOKU_SECRET_ACCESS_KEY"
+          instance.send(:apply_environment_options)
+          expect(instance.options.access_key_id).to eq "ENVOKU_ACCESS_KEY_ID"
+          expect(instance.options.secret_access_key).to eq "ENVOKU_SECRET_ACCESS_KEY"
         end
       end
       context "when options are passed" do
@@ -106,26 +116,26 @@ describe Envoku::Adapters::S3 do
           set_default_aws_keys
           set_envoku_aws_keys
           instance = Envoku::Adapters::S3.new(
-            bucket: 'test-bucket',
+            bucket_name: 'test-bucket',
             access_key_id: 'test-access-key-id',
             secret_access_key: 'test-secret-access-key',
           )
-          credentials = instance.send(:credentials)
-          expect(credentials.bucket_name).to eq 'test-bucket'
-          expect(credentials.access_key_id).to eq "test-access-key-id"
-          expect(credentials.secret_access_key).to eq "test-secret-access-key"
+          instance.send(:apply_environment_options)
+          expect(instance.options.bucket_name).to eq 'test-bucket'
+          expect(instance.options.access_key_id).to eq "test-access-key-id"
+          expect(instance.options.secret_access_key).to eq "test-secret-access-key"
         end
       end
     end
 
     context "when ENVOKU_URL is set" do
       context "when URL is valid" do
-        it "returns no credentials" do
+        it "returns no options" do
           set_default_aws_keys
           set_envoku_aws_keys
           set_invalid_envoku_url
-          credentials = instance.send(:credentials)
-          expect(credentials).to eq nil
+          instance.send(:apply_environment_options)
+          expect(instance.options).to eq OpenStruct.new
         end
       end
       context "when URL is valid" do
@@ -133,10 +143,11 @@ describe Envoku::Adapters::S3 do
           set_default_aws_keys
           set_envoku_aws_keys
           set_valid_envoku_url
-          credentials = instance.send(:credentials)
-          expect(credentials.bucket_name).to eq 'url-bucket-name'
-          expect(credentials.access_key_id).to eq "URL_ACCESS_KEY_ID"
-          expect(credentials.secret_access_key).to eq "URL_SECRET_ACCES_KEY"
+          instance.send(:apply_environment_options)
+          expect(instance.options.filename).to eq 'url-filename.env'
+          expect(instance.options.bucket_name).to eq 'url-bucket-name'
+          expect(instance.options.access_key_id).to eq "URL_ACCESS_KEY_ID"
+          expect(instance.options.secret_access_key).to eq "URL_SECRET_ACCES_KEY"
         end
       end
       context "when options are passed" do
@@ -145,14 +156,14 @@ describe Envoku::Adapters::S3 do
           set_envoku_aws_keys
           set_valid_envoku_url
           instance = Envoku::Adapters::S3.new(
-            bucket: 'test-bucket',
+            bucket_name: 'test-bucket',
             access_key_id: 'test-access-key-id',
             secret_access_key: 'test-secret-access-key',
           )
-          credentials = instance.send(:credentials)
-          expect(credentials.bucket_name).to eq 'test-bucket'
-          expect(credentials.access_key_id).to eq "test-access-key-id"
-          expect(credentials.secret_access_key).to eq "test-secret-access-key"
+          instance.send(:apply_environment_options)
+          expect(instance.options.bucket_name).to eq 'test-bucket'
+          expect(instance.options.access_key_id).to eq "test-access-key-id"
+          expect(instance.options.secret_access_key).to eq "test-secret-access-key"
         end
       end
     end
