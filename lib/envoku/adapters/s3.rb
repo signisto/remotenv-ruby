@@ -14,12 +14,12 @@ module Envoku
 
       def initialize custom_options = {}
         @options = OpenStruct.new custom_options
-        apply_environment_options
         @local_file_name = "/tmp/envoku-#{SecureRandom.hex 16}.env"
       end
 
       def load
         Dotenv.load
+        apply_environment_options
         return unless options.bucket_name && options.filename && options.access_key_id && options.secret_access_key
         FileUtils.rm @local_file_name if File.exists? @local_file_name
         return unless clone_s3_file
