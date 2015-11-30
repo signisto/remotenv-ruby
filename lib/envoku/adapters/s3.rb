@@ -13,7 +13,13 @@ module Envoku
       attr_reader :options
 
       def initialize custom_options = {}
-        @options = OpenStruct.new custom_options
+        default_options = {
+          filename: nil,
+          bucket_name: nil,
+          access_key_id: nil,
+          secret_access_key: nil,
+        }
+        @options = OpenStruct.new default_options.merge(custom_options)
         @local_file_name = "/tmp/envoku-#{SecureRandom.hex 16}.env"
       end
 

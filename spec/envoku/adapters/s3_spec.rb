@@ -20,15 +20,12 @@ describe Envoku::Adapters::S3 do
       instance = Envoku::Adapters::S3.new
       expect(instance.instance_variable_get :'@local_file_name').not_to be nil
     end
-    it "calls apply_environment_options" do
-      expect_any_instance_of(Envoku::Adapters::S3).to receive(:apply_environment_options)
-      Envoku::Adapters::S3.new
-    end
   end
 
   describe "#load" do
     context "when options are missing" do
       it "loads dotenv then skips" do
+        expect_any_instance_of(Envoku::Adapters::S3).to receive(:apply_environment_options)
         instance = Envoku::Adapters::S3.new
         expect(Dotenv).to receive(:load).with(no_args)
         expect(instance).to receive(:options).and_return OpenStruct.new
@@ -40,6 +37,7 @@ describe Envoku::Adapters::S3 do
     end
     context "when file clones correctly" do
       it "loads the environment" do
+        expect_any_instance_of(Envoku::Adapters::S3).to receive(:apply_environment_options)
         local_file_name = "/tmp/envoku-test.env"
         instance = Envoku::Adapters::S3.new
         instance.instance_variable_set :'@local_file_name', local_file_name
@@ -54,6 +52,7 @@ describe Envoku::Adapters::S3 do
     end
     context "when s3 clone fails" do
       it "loads the environment" do
+        expect_any_instance_of(Envoku::Adapters::S3).to receive(:apply_environment_options)
         local_file_name = "/tmp/envoku-test.env"
         instance = Envoku::Adapters::S3.new
         instance.instance_variable_set :'@local_file_name', local_file_name
@@ -135,7 +134,7 @@ describe Envoku::Adapters::S3 do
           set_envoku_aws_keys
           set_invalid_envoku_url
           instance.send(:apply_environment_options)
-          expect(instance.options).to eq OpenStruct.new
+          expect(instance.options).to eq OpenStruct.new(bucket_name: nil, filename: nil, access_key_id: nil, secret_access_key: nil)
         end
       end
       context "when URL is valid" do
