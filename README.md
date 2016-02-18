@@ -1,5 +1,8 @@
 # Envoku
 
+[![Circle CI](https://circleci.com/gh/marcqualie/envoku-ruby/tree/master.svg?style=svg)](https://circleci.com/gh/marcqualie/envoku-ruby/tree/master)
+[![codecov.io](https://codecov.io/github/marcqualie/envoku-ruby/coverage.svg?branch=master)](https://codecov.io/github/marcqualie/envoku-ruby?branch=master)
+
 Configuration storage that can be loaded into your application transparently at boot-time.
 
 
@@ -45,4 +48,3 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 ## Contributing
 
 Bug reports and pull requests are welcome on GitHub at https://github.com/marcqualie/envoku.
-
