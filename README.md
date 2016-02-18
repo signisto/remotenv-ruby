@@ -25,13 +25,15 @@ Or install it yourself as:
 
 ## Usage
 
-When Envoku is loaded it automatically uses Dotenv in the background to preload and other configuration machanisms you may have to make transtioning seamless.
+When Envoku is loaded it automatically uses Dotenv in the background to preload and other configuration mechanisms you may have to make transitioning seamless.
 
 ### Rails
 
 Envoku automatically pre-loads itself during `before_configuration` phase so no configuration is required.
 
 ### Plain ruby
+
+Run the following code before you need access to the environment variables
 
 ```
 Envoku.load
@@ -47,4 +49,4 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/marcqualie/envoku.
+Bug reports and pull requests are welcome on GitHub at https://github.com/marcqualie/envoku-ruby.
