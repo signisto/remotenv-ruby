@@ -4,7 +4,6 @@ module Envoku
 
     attr_reader :name
     attr_reader :description
-    attr_reader :opt_in
     # attr_reader :expires_at # when the feature will dissappear
     # attr_reader :available_at # when the feature unlocks
 
@@ -24,10 +23,11 @@ module Envoku
       attributes.each do |key, value|
         instance_variable_set(:"@#{key}", value)
       end
+      @enabled = !!@enabled
     end
 
     def enabled?
-      !!@enabled
+      @enabled
     end
 
     def enabled_for?(resource)
