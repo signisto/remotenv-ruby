@@ -20,8 +20,8 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency "dotenv", "~> 2.1"
 
-  spec.add_development_dependency "bundler", "~> 1.11"
-  spec.add_development_dependency "codecov", "~> 0.1.4"
-  spec.add_development_dependency "rake", "~> 10.5"
-  spec.add_development_dependency "rspec", "~> 3.4"
+  spec.add_development_dependency "bundler", "~> 1.13"
+  spec.add_development_dependency "codecov", "~> 0.1.5"
+  spec.add_development_dependency "rake", "~> 11.3"
+  spec.add_development_dependency "rspec", "~> 3.5"
 end
