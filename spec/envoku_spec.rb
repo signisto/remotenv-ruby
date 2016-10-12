@@ -7,7 +7,7 @@ describe Envoku do
     end
   end
 
-  describe "#load" do
+  describe "::load" do
     it "loads environment via S3 adatper" do
       options = {
         test: 1,
@@ -17,5 +17,9 @@ describe Envoku do
       expect(s3_adapter_mock).to receive(:load)
       Envoku.load options
     end
+  end
+
+  describe "::feature_enabled_for?" do
+    pending
   end
 end

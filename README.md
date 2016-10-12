@@ -39,6 +39,17 @@ Run the following code before you need access to the environment variables
 Envoku.load
 ```
 
+### Features
+
+```
+all_features = Envoku::Feature.all
+enabled_features = Envoku::Feature.all(enabled: true)
+feature = Envoku::Feature.new('BETA_SITE')
+feature.enabled? # global for all resources
+feature.enabled_for?(current_user) # does current_user have this feature enabled
+feature.enable_for!(current_user) # enable feature for current_user
+```
+
 
 ## Development
 
