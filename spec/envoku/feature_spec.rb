@@ -18,4 +18,12 @@ describe Envoku::Feature do
   describe "#enable_for!" do
     pending
   end
+
+  describe "#disable_for!" do
+    pending
+  end
+
+  describe "#resources" do
+    pending
+  end
 end

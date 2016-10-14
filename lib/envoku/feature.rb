@@ -32,11 +32,36 @@ module Envoku
 
     def enabled_for?(resource)
       return true if enabled?
-      # TODO: Implement via Redis
+      Envoku.redis.hget("envoku:features:#{resource.class.name}:#{resource.id}:#{@name}", "enabled") == "1"
     end
 
     def enable_for!(resource)
-      # TODO: Implement via Redis
+      Envoku.redis.multi do
+        Envoku.redis.sadd("envoku:features:#{@name}:#{resource.class.name}", resource.id.to_s)
+        Envoku.redis.sadd("envoku:features:#{resource.class.name}:#{resource.id}", @name)
+        Envoku.redis.hmset("envoku:features:#{resource.class.name}:#{resource.id}:#{@name}", "enabled", "1")
+      end
+    end
+
+    def disable_for!(resource)
+      Envoku.redis.multi do
+        Envoku.redis.del("envoku:features:#{@name}:#{resource.class.name}")
+        Envoku.redis.del("envoku:features:#{resource.class.name}:#{resource.id}")
+        Envoku.redis.del("envoku:features:#{resource.class.name}:#{resource.id}:#{@name}")
+      end
+    end
+
+    def resources
+      list = []
+      feature_prefix = "envoku:features:#{@name}"
+      klasses = Envoku.redis.keys("#{feature_prefix}:*").map { |klass| klass[(feature_prefix.length + 1)..-1] }
+      klasses.each do |klass|
+        ids = Envoku.redis.smembers("#{feature_prefix}:#{klass}")
+        ids.each do |id|
+          list.push("#{klass}:#{id}")
+        end
+      end
+      list
     end
   end
 end

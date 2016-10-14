@@ -19,7 +19,15 @@ describe Envoku do
     end
   end
 
+  describe "::redis" do
+    pending
+  end
+
   describe "::feature_enabled_for?" do
+    pending
+  end
+
+  describe "::features_for" do
     pending
   end
 end
