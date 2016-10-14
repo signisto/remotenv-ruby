@@ -1,5 +1,6 @@
 # Envoku
 
+[![Gem Version](https://badge.fury.io/rb/envoku.svg)](https://badge.fury.io/rb/envoku)
 [![Circle CI](https://circleci.com/gh/marcqualie/envoku-ruby/tree/master.svg?style=shield)](https://circleci.com/gh/marcqualie/envoku-ruby/tree/master)
 [![Test Coverage](https://codeclimate.com/github/marcqualie/envoku-ruby/badges/coverage.svg)](https://codeclimate.com/github/marcqualie/envoku-ruby/coverage)
 [![Code Climate](https://codeclimate.com/github/marcqualie/envoku-ruby/badges/gpa.svg)](https://codeclimate.com/github/marcqualie/envoku-ruby)
@@ -41,6 +42,7 @@ Run the following code before you need access to the environment variables
 Envoku.load
 ```
 
+
 ## Features
 
 ``` ruby
@@ -61,6 +63,7 @@ Per-resource features are stored in Redis via the following keys:
 (SET)  envoku:features:[feature]:[class] 123 456 789 # IDs for resource grouped by feature and class
 (SET)  envoku:features:[class]:[id] FEATURE1 FEATURE2 # Features grouped by resource and ID
 ```
+
 
 ## Development
 
