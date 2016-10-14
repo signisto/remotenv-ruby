@@ -1,7 +1,9 @@
 # Envoku
 
-[![Circle CI](https://circleci.com/gh/marcqualie/envoku-ruby/tree/master.svg?style=svg)](https://circleci.com/gh/marcqualie/envoku-ruby/tree/master)
-[![codecov.io](https://codecov.io/github/marcqualie/envoku-ruby/coverage.svg?branch=master)](https://codecov.io/github/marcqualie/envoku-ruby?branch=master)
+[![Circle CI](https://circleci.com/gh/marcqualie/envoku-ruby/tree/master.svg?style=shield)](https://circleci.com/gh/marcqualie/envoku-ruby/tree/master)
+[![Test Coverage](https://codeclimate.com/github/marcqualie/envoku-ruby/badges/coverage.svg)](https://codeclimate.com/github/marcqualie/envoku-ruby/coverage)
+[![Code Climate](https://codeclimate.com/github/marcqualie/envoku-ruby/badges/gpa.svg)](https://codeclimate.com/github/marcqualie/envoku-ruby)
+[![Issue Count](https://codeclimate.com/github/marcqualie/envoku-ruby/badges/issue_count.svg)](https://codeclimate.com/github/marcqualie/envoku-ruby)
 
 Configuration storage that can be loaded into your application transparently at boot-time.
 
@@ -10,7 +12,7 @@ Configuration storage that can be loaded into your application transparently at 
 
 Add this line to your application's Gemfile:
 
-```ruby
+``` ruby
 gem 'envoku'
 ```
 
@@ -35,13 +37,13 @@ Envoku automatically pre-loads itself during `before_configuration` phase so no 
 
 Run the following code before you need access to the environment variables
 
-```
+``` ruby
 Envoku.load
 ```
 
 ## Features
 
-```
+``` ruby
 all_features = Envoku::Feature.all
 feature = Envoku::Feature.new('FEATURE1')
 feature.enabled? # global for all resources
