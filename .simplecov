@@ -1,8 +1,12 @@
+require "codeclimate-test-reporter"
 require 'codecov'
+
 SimpleCov.formatter = SimpleCov::Formatter::MultiFormatter.new([
-  SimpleCov::Formatter::HTMLFormatter,
+  CodeClimate::TestReporter::Formatter,
   SimpleCov::Formatter::Codecov,
+  SimpleCov::Formatter::HTMLFormatter,
 ])
 SimpleCov.start do
-  add_filter 'spec'
+  add_filter "spec"
+  add_group "Adapters", "lib/envoku/adapters/"
 end
