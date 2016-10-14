@@ -51,6 +51,10 @@ module Envoku
       end
     end
 
+    def toggle_for!(resource)
+      enabled_for?(resource) ? disable_for!(resource) : enable_for!(resource)
+    end
+
     def resources
       list = []
       feature_prefix = "envoku:features:#{@name}"

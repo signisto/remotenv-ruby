@@ -3,6 +3,8 @@ require "redis"
 require "envoku/version"
 require "envoku/adapters/s3"
 require "envoku/feature"
+require "envoku/resource"
+
 require "envoku/rails" if defined?(Rails)
 
 module Envoku
@@ -26,5 +28,10 @@ module Envoku
 
   def features_for(resource)
     redis.smembers("envoku:features:#{resource.class.name}:#{resource.id}")
+  end
+
+  def features_enabled_for(resource)
+    features = redis.smembers("envoku:features:#{resource.class.name}:#{resource.id}")
+    features.select { |name| Feature.new(name).enabled_for?(resource) }
   end
 end
