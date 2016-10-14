@@ -18,5 +18,10 @@ module Envoku
     def self.load
       instance.load
     end
+
+    # Rake tasks
+    rake_tasks do
+      Rails::Railtie.instance_method(:load).bind(self).call("tasks/envoku.rake")
+    end
   end
 end
