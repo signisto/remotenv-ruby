@@ -23,15 +23,10 @@ module Envoku
   end
 
   def feature_enabled_for?(feature_name, resource)
-    Envoku::Feature.new(feature_name).enabled_for?(resource)
-  end
-
-  def features_for(resource)
-    redis.smembers("envoku:features:#{resource.class.name}:#{resource.id}")
+    Feature.new(feature_name).enabled_for?(resource)
   end
 
   def features_enabled_for(resource)
-    features = redis.smembers("envoku:features:#{resource.class.name}:#{resource.id}")
-    features.select { |name| Feature.new(name).enabled_for?(resource) }
+    redis.smembers("#{Feature::REDIS_NAMESPACE}#{resource.class.name}:#{resource.id}")
   end
 end

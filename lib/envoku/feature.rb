@@ -1,6 +1,9 @@
+require 'yaml'
+
 module Envoku
   class Feature
     ENV_NAMESPACE = "ENVOKU_FEATURE_"
+    REDIS_NAMESPACE = "envoku:features:"
 
     attr_reader :name
     attr_reader :description
@@ -14,9 +17,10 @@ module Envoku
 
     def initialize(name)
       @name = name
+      @enabled = false
       var_string = ENV["#{ENV_NAMESPACE}#{name}"]
       return nil unless var_string
-      attributes = YAML.safe_load(var_string)
+      attributes = ::YAML.safe_load(var_string) rescue {}
       attributes.each do |key, value|
         instance_variable_set(:"@#{key}", value)
       end
@@ -29,20 +33,20 @@ module Envoku
 
     def enabled_for?(resource)
       return true if enabled?
-      Envoku.redis.sismember("envoku:features:#{@name}:#{resource.class.name}", "#{resource.id}")
+      Envoku.redis.sismember("#{REDIS_NAMESPACE}#{@name}:#{resource.class.name}", "#{resource.id}")
     end
 
     def enable_for!(resource)
       Envoku.redis.multi do
-        Envoku.redis.sadd("envoku:features:#{@name}:#{resource.class.name}", resource.id.to_s)
-        Envoku.redis.sadd("envoku:features:#{resource.class.name}:#{resource.id}", @name)
+        Envoku.redis.sadd("#{REDIS_NAMESPACE}#{@name}:#{resource.class.name}", resource.id.to_s)
+        Envoku.redis.sadd("#{REDIS_NAMESPACE}#{resource.class.name}:#{resource.id}", @name)
       end
     end
 
     def disable_for!(resource)
       Envoku.redis.multi do
-        Envoku.redis.del("envoku:features:#{@name}:#{resource.class.name}")
-        Envoku.redis.del("envoku:features:#{resource.class.name}:#{resource.id}")
+        Envoku.redis.del("#{REDIS_NAMESPACE}#{@name}:#{resource.class.name}")
+        Envoku.redis.del("#{REDIS_NAMESPACE}#{resource.class.name}:#{resource.id}")
       end
     end
 
@@ -52,7 +56,7 @@ module Envoku
 
     def resources
       list = []
-      feature_prefix = "envoku:features:#{@name}"
+      feature_prefix = "#{REDIS_NAMESPACE}#{@name}"
       klasses = Envoku.redis.keys("#{feature_prefix}:*").map { |klass| klass[(feature_prefix.length + 1)..-1] }
       klasses.each do |klass|
         ids = Envoku.redis.smembers("#{feature_prefix}:#{klass}")
