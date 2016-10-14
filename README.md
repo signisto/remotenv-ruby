@@ -39,15 +39,18 @@ Run the following code before you need access to the environment variables
 Envoku.load
 ```
 
-### Features
+## Features
 
 ```
 all_features = Envoku::Feature.all
-enabled_features = Envoku::Feature.all(enabled: true)
 feature = Envoku::Feature.new('FEATURE1')
 feature.enabled? # global for all resources
 feature.enabled_for?(current_user) # does current_user have this feature enabled
 feature.enable_for!(current_user) # enable feature for current_user
+feature.disable_for!(current_user) # disable feature for current_user
+resource.feature_enabled?('FEATURE1')
+resource.toggle_feature!('FEATURE1')
+resource.features_enabled
 ```
 
 Per-resource features are stored in Redis via the following keys:
@@ -55,7 +58,6 @@ Per-resource features are stored in Redis via the following keys:
 ```
 (SET)  envoku:features:[feature]:[class] 123 456 789 # IDs for resource grouped by feature and class
 (SET)  envoku:features:[class]:[id] FEATURE1 FEATURE2 # Features grouped by resource and ID
-(HASH) envoku:features:[class]:[id]:[feature] enabled=1 available_at=1476454616 expires_at=1476454616
 ```
 
 ## Development

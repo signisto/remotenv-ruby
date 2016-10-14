@@ -4,11 +4,8 @@ module Envoku
 
     attr_reader :name
     attr_reader :description
-    # attr_reader :expires_at # when the feature will dissappear
-    # attr_reader :available_at # when the feature unlocks
 
-    def self.all(filter = {})
-      # TODO: Implement filters
+    def self.all
       keys = ENV.select { |key, value| key.index(ENV_NAMESPACE) == 0 }
       keys.keys.map do |key|
         Feature.new(key[(ENV_NAMESPACE.length)..-1])
@@ -32,14 +29,13 @@ module Envoku
 
     def enabled_for?(resource)
       return true if enabled?
-      Envoku.redis.hget("envoku:features:#{resource.class.name}:#{resource.id}:#{@name}", "enabled") == "1"
+      Envoku.redis.sismember("envoku:features:#{@name}:#{resource.class.name}", "#{resource.id}")
     end
 
     def enable_for!(resource)
       Envoku.redis.multi do
         Envoku.redis.sadd("envoku:features:#{@name}:#{resource.class.name}", resource.id.to_s)
         Envoku.redis.sadd("envoku:features:#{resource.class.name}:#{resource.id}", @name)
-        Envoku.redis.hmset("envoku:features:#{resource.class.name}:#{resource.id}:#{@name}", "enabled", "1")
       end
     end
 
@@ -47,7 +43,6 @@ module Envoku
       Envoku.redis.multi do
         Envoku.redis.del("envoku:features:#{@name}:#{resource.class.name}")
         Envoku.redis.del("envoku:features:#{resource.class.name}:#{resource.id}")
-        Envoku.redis.del("envoku:features:#{resource.class.name}:#{resource.id}:#{@name}")
       end
     end
 

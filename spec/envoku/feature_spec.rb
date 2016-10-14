@@ -23,6 +23,10 @@ describe Envoku::Feature do
     pending
   end
 
+  describe "#toggle_for!" do
+    pending
+  end
+
   describe "#resources" do
     pending
   end
