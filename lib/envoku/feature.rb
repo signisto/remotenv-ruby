@@ -57,6 +57,12 @@ module Envoku
       enabled_for?(resource) ? disable_for!(resource) : enable_for!(resource)
     end
 
+    def permitted_for?(resource_klass)
+      return true unless @attributes.has_key?('permitted_resources')
+      resource_klass = resource_klass.class.name unless resource_klass.is_a?(String)
+      @attributes['permitted_resources'].split(',').include?(resource_klass)
+    end
+
     def resources
       list = []
       feature_prefix = "#{REDIS_NAMESPACE}#{@name}"

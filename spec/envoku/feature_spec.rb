@@ -127,6 +127,37 @@ describe Envoku::Feature do
     end
   end
 
+  describe "permitted_for?" do
+    context "class name as string" do
+      it "returns true when permitted globally" do
+        ENV["#{Envoku::Feature::ENV_NAMESPACE}DUMMY1"] = "description: 'something'"
+        expect(feature.permitted_for?('DummyResource')).to eq(true)
+      end
+      it "returns true when permitted for this resource" do
+        ENV["#{Envoku::Feature::ENV_NAMESPACE}DUMMY1"] = "description: 'something'\npermitted_resources: 'DummyResource'"
+        expect(feature.permitted_for?('DummyResource')).to eq(true)
+      end
+      it "returns true when permitted for this resource" do
+        ENV["#{Envoku::Feature::ENV_NAMESPACE}DUMMY1"] = "description: 'something'\npermitted_resources: 'NonExistentResource'"
+        expect(feature.permitted_for?('DummyResource')).to eq(false)
+      end
+    end
+    context "class passed directly" do
+      it "returns true when permitted globally" do
+        ENV["#{Envoku::Feature::ENV_NAMESPACE}DUMMY1"] = "description: 'something'"
+        expect(feature.permitted_for?(resource)).to eq(true)
+      end
+      it "returns true when permitted for this resource" do
+        ENV["#{Envoku::Feature::ENV_NAMESPACE}DUMMY1"] = "description: 'something'\npermitted_resources: 'DummyResource'"
+        expect(feature.permitted_for?(resource)).to eq(true)
+      end
+      it "returns true when permitted for this resource" do
+        ENV["#{Envoku::Feature::ENV_NAMESPACE}DUMMY1"] = "description: 'something'\npermitted_resources: 'NonExistentResource'"
+        expect(feature.permitted_for?(resource)).to eq(false)
+      end
+    end
+  end
+
   describe "#resources" do
     it "returns grouped resources" do
       Envoku.redis.sadd("#{Envoku::Feature::REDIS_NAMESPACE}#{feature.name}:Org", "1")
