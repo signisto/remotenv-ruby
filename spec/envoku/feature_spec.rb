@@ -47,6 +47,27 @@ describe Envoku::Feature do
     end
   end
 
+  describe "#attributes" do
+    context "no custom data password" do
+      it "is en empty hash" do
+        ENV["#{Envoku::Feature::ENV_NAMESPACE}DUMMY1"] = "description: 'something'\nenabled: true"
+        expect(feature.name).to eq('DUMMY1')
+        expect(feature.description).to eq('something')
+        expect(feature.attributes).to eq({})
+        expect(feature.enabled?).to eq(true)
+      end
+    end
+    context "custom attributes" do
+      it "contains just the custom attributes" do
+        ENV["#{Envoku::Feature::ENV_NAMESPACE}DUMMY1"] = "description: 'something'\nenabled: true\npermitted_resources: 'Organization'"
+        expect(feature.name).to eq('DUMMY1')
+        expect(feature.description).to eq('something')
+        expect(feature.attributes).to eq({"permitted_resources" => "Organization"})
+        expect(feature.enabled?).to eq(true)
+      end
+    end
+  end
+
   describe "#enabled?" do
     it "proxies @enabled" do
       feature.instance_variable_set(:'@enabled', true)

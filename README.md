@@ -45,6 +45,12 @@ Envoku.load
 
 ## Features
 
+Feature are defined as standard environment variables as YAML objects in the following format:
+
+``` shell
+ENVOKU_FEATURE_FEATURE1="description: 'Example feature', attribute1: 'something'"
+```
+
 ``` ruby
 all_features = Envoku::Feature.all
 feature = Envoku::Feature.new('FEATURE1')
@@ -52,6 +58,7 @@ feature.enabled? # global for all resources
 feature.enabled_for?(current_user) # does current_user have this feature enabled
 feature.enable_for!(current_user) # enable feature for current_user
 feature.disable_for!(current_user) # disable feature for current_user
+feature.attributes # {"attribute1" => "something"}
 resource.feature_enabled?('FEATURE1')
 resource.toggle_feature!('FEATURE1')
 resource.features_enabled

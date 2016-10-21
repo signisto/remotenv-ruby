@@ -7,6 +7,7 @@ module Envoku
 
     attr_reader :name
     attr_reader :description
+    attr_reader :attributes
 
     def self.all
       keys = ENV.select { |key, value| key.index(ENV_NAMESPACE) == 0 }
@@ -18,13 +19,15 @@ module Envoku
     def initialize(name)
       @name = name
       @enabled = false
+      @attributes = {}
+      @description = nil
       var_string = ENV["#{ENV_NAMESPACE}#{name}"]
       return nil unless var_string
-      attributes = ::YAML.safe_load(var_string) rescue {}
-      attributes.each do |key, value|
-        instance_variable_set(:"@#{key}", value)
-      end
-      @enabled = !!@enabled
+      @attributes = ::YAML.safe_load(var_string) rescue {}
+      @description = @attributes['description']
+      @enabled = !!@attributes['enabled']
+      @attributes.delete('description')
+      @attributes.delete('enabled')
     end
 
     def enabled?
