@@ -40,6 +40,7 @@ module Envoku
     end
 
     def enable_for!(resource)
+      Envoku.logger.warn("feature #{name} is not permitted for #{resource.class.name}") unless permitted_for?(resource.class.name)
       Envoku.redis.multi do
         Envoku.redis.sadd("#{REDIS_NAMESPACE}#{@name}:#{resource.class.name}", resource.id.to_s)
         Envoku.redis.sadd("#{REDIS_NAMESPACE}#{resource.class.name}:#{resource.id}", @name)
@@ -47,6 +48,7 @@ module Envoku
     end
 
     def disable_for!(resource)
+      Envoku.logger.warn("feature #{name} is not permitted for #{resource.class.name}") unless permitted_for?(resource.class.name)
       Envoku.redis.multi do
         Envoku.redis.del("#{REDIS_NAMESPACE}#{@name}:#{resource.class.name}")
         Envoku.redis.del("#{REDIS_NAMESPACE}#{resource.class.name}:#{resource.id}")

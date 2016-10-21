@@ -85,8 +85,8 @@ Per-resource features are stored in Redis via the following keys:
 
 ## Todo
 
-- Logging and warnings
-- Show warning when toggling features for non-permitted resources
+- ~~Logging~~
+- ~~Show warning when toggling features for non-permitted resources~~
 - Add `Envoku.configure {}` functionality
 
 

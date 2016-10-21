@@ -97,9 +97,15 @@ describe Envoku::Feature do
   describe "#enable_for!" do
     it "sets redis values" do
       ENV["#{Envoku::Feature::ENV_NAMESPACE}DUMMY1"] = "description: 'something'\nenabled: false"
+      expect(Envoku.logger).not_to receive(:warn)
       feature.enable_for!(resource)
       expect(Envoku.redis.smembers("#{Envoku::Feature::REDIS_NAMESPACE}#{feature.name}:#{resource.class.name}")).to eq([resource.id.to_s])
       expect(Envoku.redis.smembers("#{Envoku::Feature::REDIS_NAMESPACE}#{resource.class.name}:#{resource.id}")).to eq([feature.name])
+    end
+    it "triggers a warning if resource is not permitted" do
+      ENV["#{Envoku::Feature::ENV_NAMESPACE}DUMMY1"] = "description: 'something'\npermitted_resources: 'NonExistentResource'"
+      expect(Envoku.logger).to receive(:warn).with("feature DUMMY1 is not permitted for DummyResource")
+      feature.enable_for!(resource)
     end
   end
 
