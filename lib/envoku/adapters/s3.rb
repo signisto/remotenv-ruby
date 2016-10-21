@@ -31,8 +31,18 @@ module Envoku
         Envoku.logger.debug("Downloading \"#{options.bucket_name}/#{options.filename}\" from S3")
         FileUtils.rm @local_file_name if File.exists? @local_file_name
         return unless clone_s3_file
+        @_env_before = ENV.to_h
         Envoku.logger.debug("Applying ENV vars from S3")
         Dotenv.overload(@local_file_name)
+        @_env_after = ENV.to_h
+        # TODO: Abstract the env diff to adapter base
+        @_env_after.each do |key, value|
+          if !@_env_before.has_key?(key)
+            Envoku.logger.debug("- ADD #{key}")
+          elsif @_env_before[key] != value
+            Envoku.logger.debug("- MOD #{key}")
+          end
+        end
         FileUtils.rm @local_file_name
         ENV['ENVOKU_REFRESHED_AT'] = Time.now.to_s
       end
