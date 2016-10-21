@@ -2,6 +2,8 @@ $LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
 require 'simplecov'
 require 'envoku'
 
+Envoku.logger.level = Envoku::Logger::WARN
+
 RSpec.configure do |config|
 
   config.before :each do

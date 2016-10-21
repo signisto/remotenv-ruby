@@ -24,11 +24,14 @@ module Envoku
       end
 
       def load
+        Envoku.logger.debug("Loading via S3 Adapter")
         Dotenv.load
         apply_environment_options
         return unless options.bucket_name && options.filename && options.access_key_id && options.secret_access_key
+        Envoku.logger.debug("Downloading \"#{options.bucket_name}/#{options.filename}\" from S3")
         FileUtils.rm @local_file_name if File.exists? @local_file_name
         return unless clone_s3_file
+        Envoku.logger.debug("Applying ENV vars from S3")
         Dotenv.overload(@local_file_name)
         FileUtils.rm @local_file_name
         ENV['ENVOKU_REFRESHED_AT'] = Time.now.to_s

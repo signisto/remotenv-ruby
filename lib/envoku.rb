@@ -1,4 +1,5 @@
 require "redis"
+require "logger"
 
 require "envoku/version"
 require "envoku/adapters/s3"
@@ -12,7 +13,8 @@ module Envoku
   module_function
 
   def load(options = {})
-    instance = Envoku::Adapters::S3.new options
+    Envoku.logger.debug("load")
+    instance = Envoku::Adapters::S3.new(options)
     instance.load
   end
 
@@ -29,4 +31,14 @@ module Envoku
   def features_enabled_for(resource)
     redis.smembers("#{Feature::REDIS_NAMESPACE}#{resource.class.name}:#{resource.id}")
   end
+
+  def logger
+    @_logger
+  end
+
+  def logger=(logger)
+    @_logger = logger
+  end
 end
+
+require "envoku/logger"
