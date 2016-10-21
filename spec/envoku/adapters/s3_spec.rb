@@ -44,7 +44,7 @@ describe Envoku::Adapters::S3 do
         expect(Dotenv).to receive(:load).with(no_args)
         expect(instance).to receive(:options).at_least(:once).and_return(OpenStruct.new bucket_name: 'test', filename: 'test.env', access_key_id: 'XXX', secret_access_key: 'XXXXX')
         expect(instance).to receive(:clone_s3_file).and_return true
-        expect(Dotenv).to receive(:load).with(local_file_name)
+        expect(Dotenv).to receive(:overload).with(local_file_name)
         expect(FileUtils).to receive(:rm).with(local_file_name)
         instance.load
         expect(ENV['ENVOKU_REFRESHED_AT']).not_to be nil
@@ -59,7 +59,7 @@ describe Envoku::Adapters::S3 do
         expect(Dotenv).to receive(:load).with(no_args)
         expect(instance).to receive(:options).at_least(:once).and_return(OpenStruct.new bucket_name: 'test', filename: 'test.env', access_key_id: 'XXX', secret_access_key: 'XXXXX')
         expect(instance).to receive(:clone_s3_file).and_return false
-        expect(Dotenv).not_to receive(:load)
+        expect(Dotenv).not_to receive(:overload)
         expect(FileUtils).not_to receive(:rm)
         instance.load
         expect(ENV['ENVOKU_REFRESHED_AT']).to be nil

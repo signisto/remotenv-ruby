@@ -29,7 +29,7 @@ module Envoku
         return unless options.bucket_name && options.filename && options.access_key_id && options.secret_access_key
         FileUtils.rm @local_file_name if File.exists? @local_file_name
         return unless clone_s3_file
-        Dotenv.load @local_file_name
+        Dotenv.overload(@local_file_name)
         FileUtils.rm @local_file_name
         ENV['ENVOKU_REFRESHED_AT'] = Time.now.to_s
       end
