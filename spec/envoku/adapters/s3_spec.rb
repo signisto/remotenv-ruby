@@ -27,11 +27,12 @@ describe Envoku::Adapters::S3 do
       it "loads dotenv then skips" do
         expect_any_instance_of(Envoku::Adapters::S3).to receive(:apply_environment_options)
         instance = Envoku::Adapters::S3.new
-        expect(Dotenv).to receive(:load).with(no_args)
+        expect(Dotenv).to receive(:load).with("#{Dir.pwd}/.env").and_return("KEY1" => "VALUE1")
         expect(instance).to receive(:options).and_return OpenStruct.new
         expect(FileUtils).not_to receive(:rm)
         expect(instance).not_to receive(:clone_s3_file)
         instance.load
+        expect(instance.instance_variable_get(:"@data")).to eq("KEY1" => "VALUE1")
         expect(ENV['ENVOKU_REFRESHED_AT']).to be nil
       end
     end
@@ -41,12 +42,15 @@ describe Envoku::Adapters::S3 do
         local_file_name = "/tmp/envoku-test.env"
         instance = Envoku::Adapters::S3.new
         instance.instance_variable_set :'@local_file_name', local_file_name
-        expect(Dotenv).to receive(:load).with(no_args)
+        expect(Dotenv).to receive(:load).with("#{Dir.pwd}/.env").and_return("KEY1" => "VALUE1")
         expect(instance).to receive(:options).at_least(:once).and_return(OpenStruct.new bucket_name: 'test', filename: 'test.env', access_key_id: 'XXX', secret_access_key: 'XXXXX')
-        expect(instance).to receive(:clone_s3_file).and_return true
-        expect(Dotenv).to receive(:overload).with(local_file_name)
+        expect(instance).to receive(:clone_s3_file).and_return(true)
+        expect(Dotenv).to receive(:overload).with(local_file_name) do
+          {"KEY2" => "VALUE2"}
+        end
         expect(FileUtils).to receive(:rm).with(local_file_name)
         instance.load
+        expect(instance.instance_variable_get(:"@data")).to eq("KEY1" => "VALUE1", "KEY2" => "VALUE2")
         expect(ENV['ENVOKU_REFRESHED_AT']).not_to be nil
       end
     end
@@ -56,9 +60,9 @@ describe Envoku::Adapters::S3 do
         local_file_name = "/tmp/envoku-test.env"
         instance = Envoku::Adapters::S3.new
         instance.instance_variable_set :'@local_file_name', local_file_name
-        expect(Dotenv).to receive(:load).with(no_args)
+        expect(Dotenv).to receive(:load).with("#{Dir.pwd}/.env")
         expect(instance).to receive(:options).at_least(:once).and_return(OpenStruct.new bucket_name: 'test', filename: 'test.env', access_key_id: 'XXX', secret_access_key: 'XXXXX')
-        expect(instance).to receive(:clone_s3_file).and_return false
+        expect(instance).to receive(:clone_s3_file).and_return(false)
         expect(Dotenv).not_to receive(:overload)
         expect(FileUtils).not_to receive(:rm)
         instance.load
@@ -168,4 +172,33 @@ describe Envoku::Adapters::S3 do
     end
   end
 
+  describe "#get_all" do
+    it "returns @data" do
+      instance = Envoku::Adapters::S3.new
+      instance.instance_variable_set(:"@data", {"KEY" => "VALUE"})
+      expect(instance.get_all).to eq("KEY" => "VALUE")
+    end
+    it "returns @data" do
+      instance = Envoku::Adapters::S3.new
+      instance.instance_variable_set(:"@data", {})
+      expect(instance.get_all).to eq({})
+    end
+  end
+
+  describe "#get" do
+    it "returns @data[KEY]" do
+      instance = Envoku::Adapters::S3.new
+      instance.instance_variable_set(:"@data", {"KEY" => "VALUE"})
+      expect(instance.get("KEY")).to eq("VALUE")
+    end
+    it "returns nil" do
+      instance = Envoku::Adapters::S3.new
+      instance.instance_variable_set(:"@data", {"KEY" => "VALUE"})
+      expect(instance.get("KEY_2")).to eq(nil)
+    end
+  end
+
+  describe "#set" do
+    pending
+  end
 end

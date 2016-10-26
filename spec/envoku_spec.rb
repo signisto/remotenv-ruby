@@ -21,6 +21,36 @@ describe Envoku do
     end
   end
 
+  describe "::get_all" do
+    it "proxies to adapter" do
+      s3_adapter_mock = double
+      expect(Envoku::Adapters::S3).to receive(:new).and_return(s3_adapter_mock)
+      expect(s3_adapter_mock).to receive(:load)
+      expect(s3_adapter_mock).to receive(:get_all).and_return({"KEY" => "VALUE"})
+      expect(Envoku.get_all).to eq("KEY" => "VALUE")
+    end
+  end
+
+  describe "::get" do
+    it "proxies to adapter" do
+      s3_adapter_mock = double
+      expect(Envoku::Adapters::S3).to receive(:new).and_return(s3_adapter_mock)
+      expect(s3_adapter_mock).to receive(:load)
+      expect(s3_adapter_mock).to receive(:get).with("KEY").and_return("VALUE")
+      expect(Envoku.get("KEY")).to eq("VALUE")
+    end
+  end
+
+  describe "::set" do
+    it "proxies to adapter" do
+      s3_adapter_mock = double
+      expect(Envoku::Adapters::S3).to receive(:new).and_return(s3_adapter_mock)
+      expect(s3_adapter_mock).to receive(:load)
+      expect(s3_adapter_mock).to receive(:set).with("KEY", "VALUE").and_return("VALUE")
+      expect(Envoku.set("KEY", "VALUE")).to eq("VALUE")
+    end
+  end
+
   describe "::redis" do
     it "calls Redis.new with ENVOKU_REDIS_URL" do
       ENV['ENVOKU_REDIS_URL'] = "redis://localhost:1234/0"

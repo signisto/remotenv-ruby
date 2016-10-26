@@ -18,6 +18,24 @@ module Envoku
     instance.load
   end
 
+  def get_all
+    adapter = Envoku::Adapters::S3.new
+    adapter.load
+    adapter.get_all
+  end
+
+  def get(key)
+    adapter = Envoku::Adapters::S3.new
+    adapter.load
+    adapter.get(key)
+  end
+
+  def set(key, value)
+    adapter = Envoku::Adapters::S3.new
+    adapter.load
+    adapter.set(key, value)
+  end
+
   def redis
     @redis ||= ::Redis.new(
       url: (ENV['ENVOKU_REDIS_URL'] || ENV['REDIS_URL']),

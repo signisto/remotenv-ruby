@@ -21,11 +21,13 @@ module Envoku
         }
         @options = OpenStruct.new default_options.merge(custom_options)
         @local_file_name = "/tmp/envoku-#{SecureRandom.hex 16}.env"
+        @data = {}
       end
 
       def load
         Envoku.logger.debug("Loading via S3 Adapter")
-        Dotenv.load
+        @data_local = Dotenv.load("#{Dir.pwd}/.env") || {}
+        @data = @data_local.dup
         apply_environment_options
         return unless options.bucket_name && options.filename && options.access_key_id && options.secret_access_key
         Envoku.logger.debug("Downloading \"#{options.bucket_name}/#{options.filename}\" from S3")
@@ -33,18 +35,34 @@ module Envoku
         return unless clone_s3_file
         @_env_before = ENV.to_h
         Envoku.logger.debug("Applying ENV vars from S3")
-        Dotenv.overload(@local_file_name)
+        @data_remote = Dotenv.overload(@local_file_name) || {}
+        @data = @data_local.merge(@data_remote)
         @_env_after = ENV.to_h
         # TODO: Abstract the env diff to adapter base
         @_env_after.each do |key, value|
           if !@_env_before.has_key?(key)
             Envoku.logger.debug("- ADD #{key}")
+            # @data[key] = value
           elsif @_env_before[key] != value
             Envoku.logger.debug("- MOD #{key}")
+            # @data[key] = value
           end
         end
         FileUtils.rm @local_file_name
         ENV['ENVOKU_REFRESHED_AT'] = Time.now.to_s
+      end
+
+      def get_all
+        @data
+      end
+
+      def get(key)
+        @data[key]
+      end
+
+      def set(key, value)
+        # TODO: Not yet implemented
+        @data[key] = value
       end
 
       private
