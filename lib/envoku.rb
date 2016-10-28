@@ -8,6 +8,8 @@ require "envoku/logger"
 require "envoku/resource"
 require "envoku/utils"
 
+Dotenv.load("#{Dir.pwd}/.env") if defined?(Dotenv) && ENV['RAILS_ENV'] != "test"
+
 require "envoku/rails" if defined?(Rails)
 
 module Envoku

@@ -12,7 +12,7 @@ module Envoku
 
       attr_reader :options
 
-      def initialize custom_options = {}
+      def initialize(custom_options = {})
         default_options = {
           filename: nil,
           bucket_name: nil,
@@ -26,8 +26,6 @@ module Envoku
 
       def load
         Envoku.logger.debug("Loading via S3 Adapter")
-        @data_local = Dotenv.load("#{Dir.pwd}/.env") || {}
-        @data = @data_local.dup
         apply_environment_options
         return unless options.bucket_name && options.filename && options.access_key_id && options.secret_access_key
         Envoku.logger.debug("Downloading \"#{options.bucket_name}/#{options.filename}\" from S3")
@@ -35,8 +33,7 @@ module Envoku
         return unless clone_s3_file
         @_env_before = ENV.to_h
         Envoku.logger.debug("Applying ENV vars from S3")
-        @data_remote = Dotenv.overload(@local_file_name) || {}
-        @data = @data_local.merge(@data_remote)
+        @data = Dotenv.overload(@local_file_name) || {}
         @_env_after = ENV.to_h
         # TODO: Abstract the env diff to adapter base
         @_env_after.each do |key, value|
