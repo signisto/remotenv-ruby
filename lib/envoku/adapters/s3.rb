@@ -33,7 +33,7 @@ module Envoku
         return unless clone_s3_file
         @_env_before = ENV.to_h
         Envoku.logger.debug("Applying ENV vars from S3")
-        @data = Dotenv.overload(@local_file_name) || {}
+        @data = Dotenv.load(@local_file_name) || {}
         @_env_after = ENV.to_h
         # TODO: Abstract the env diff to adapter base
         @_env_after.each do |key, value|
