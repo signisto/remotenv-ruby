@@ -84,7 +84,6 @@ describe Envoku do
       feature2 = Envoku::Feature.new('DUMMY2')
       resource1 = DummyResource.new(id: 1)
       resource2 = DummyResource.new(id: 2)
-      puts "id = #{resource2.id}"
       feature1.enable_for!(resource1)
       feature2.enable_for!(resource1)
       feature2.enable_for!(resource2)

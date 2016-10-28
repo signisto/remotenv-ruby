@@ -9,7 +9,8 @@ namespace :envoku do
 
   desc "Show Envoku Info"
   task :info => :load do
-    puts "URL: #{ENV['ENVOKU_URL'] ? ENV['ENVOKU_URL'] : "[not set]"}"
+    puts "URL: #{Envoku::URL || '[not set]'}"
+    puts "URI: #{Envoku::URI.to_yaml}"
   end
 
   desc "List Envoku Features"

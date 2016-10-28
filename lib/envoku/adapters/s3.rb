@@ -79,7 +79,7 @@ module Envoku
           "Expires=#{s3_expires_at.to_i}",
           "Signature=#{CGI.escape Base64.encode64(hmac).strip}"
         ]
-        s3_signed_uri = URI.parse "#{s3_direct_url}?#{query_params.join('&')}"
+        s3_signed_uri = ::URI.parse "#{s3_direct_url}?#{query_params.join('&')}"
         s3_response = Net::HTTP.get_response s3_signed_uri
         if s3_response.is_a? Net::HTTPSuccess
           File.write @local_file_name, s3_response.body
@@ -87,13 +87,12 @@ module Envoku
       end
 
       def apply_environment_options
-        if ENV['ENVOKU_URL']
-          envoku_uri = URI.parse(ENV['ENVOKU_URL'])
-          return nil unless envoku_uri.host && envoku_uri.path && envoku_uri.user && envoku_uri.password
-          @options.filename ||= envoku_uri.path[1..-1]
-          @options.bucket_name ||= envoku_uri.host
-          @options.access_key_id ||= envoku_uri.user
-          @options.secret_access_key ||= envoku_uri.password
+        if Envoku::URL
+          return nil unless Envoku::URI && Envoku::URI.host && Envoku::URI.path && Envoku::URI.user && Envoku::URI.password
+          @options.filename ||= Envoku::URI.path[1..-1]
+          @options.bucket_name ||= Envoku::URI.host
+          @options.access_key_id ||= Envoku::URI.user
+          @options.secret_access_key ||= ::URI.unescape(Envoku::URI.password)
         else
           @options.filename ||= ENV['ENVOKU_FILENAME']
           @options.bucket_name ||= ENV['ENVOKU_BUCKET']

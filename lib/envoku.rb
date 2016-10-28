@@ -6,10 +6,14 @@ require "envoku/adapters/s3"
 require "envoku/feature"
 require "envoku/logger"
 require "envoku/resource"
+require "envoku/utils"
 
 require "envoku/rails" if defined?(Rails)
 
 module Envoku
+
+  URL = Envoku::Utils.parsed_url
+  URI = Envoku::Utils.parsed_uri
 
   module_function
 

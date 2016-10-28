@@ -21,6 +21,8 @@ RSpec.configure do |config|
       ENV.delete(key)
     end
     Envoku.instance_variable_set(:'@redis', nil)
+    stub_const("Envoku::URL", nil)
+    stub_const("Envoku::URI", nil)
   end
 
   config.after :each do
