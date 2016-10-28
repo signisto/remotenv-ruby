@@ -1,6 +1,17 @@
 require 'yaml'
 
 module Envoku
+
+  module_function
+
+  def feature_enabled_for?(feature_name, resource)
+    Feature.new(feature_name).enabled_for?(resource)
+  end
+
+  def features_enabled_for(resource)
+    redis.smembers("#{Feature::REDIS_NAMESPACE}#{resource.class.name}:#{resource.id}")
+  end
+
   class Feature
     ENV_NAMESPACE = "ENVOKU_FEATURE_"
     REDIS_NAMESPACE = "envoku:features:"

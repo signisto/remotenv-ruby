@@ -1,6 +1,17 @@
 require "logger"
 
 module Envoku
+
+  module_function
+
+  def logger
+    @_logger
+  end
+
+  def logger=(logger)
+    @_logger = logger
+  end
+
   class Logger < ::Logger
     def initialize(*args)
       super
