@@ -20,7 +20,7 @@ module Envoku
   module_function
 
   def load(options = {})
-    Envoku.logger.debug("load")
+    Envoku.logger.info("load using S3 adapter")
     instance = Envoku::Adapters::S3.new(options)
     instance.load
   end
