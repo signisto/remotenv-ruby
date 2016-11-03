@@ -2,8 +2,6 @@ $LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
 require 'simplecov'
 require 'envoku'
 
-Envoku.logger.level = Envoku::Logger::FATAL
-
 RSpec.configure do |config|
 
   config.before :each do
@@ -16,6 +14,8 @@ RSpec.configure do |config|
       'ENVOKU_URL',
       'ENVOKU_REDIS_URL',
       'REDIS_URL',
+      'LOG_LEVEL',
+      'ENVOKU_LOG_LEVEL',
     ].each { |key| ENV.delete(key) }
     ENV.select { |key, value| key.index(Envoku::Feature::ENV_NAMESPACE) == 0 }.keys.each do |key|
       ENV.delete(key)
@@ -23,6 +23,8 @@ RSpec.configure do |config|
     Envoku.instance_variable_set(:'@redis', nil)
     stub_const("Envoku::URL", nil)
     stub_const("Envoku::URI", nil)
+    Envoku.logger = nil
+    Envoku.logger.level = :fatal
   end
 
   config.after :each do
