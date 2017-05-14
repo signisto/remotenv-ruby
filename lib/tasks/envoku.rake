@@ -22,8 +22,7 @@ namespace :envoku do
 
   desc "List all keys"
   task :list => :load do
-    data = Envoku.get_all
-    data.each do |key, value|
+    Envoku.data.each do |key, value|
       puts "\e[33m#{key}\e[0m \e[90m=\e[0m #{value}"
     end
   end

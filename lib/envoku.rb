@@ -22,23 +22,23 @@ module Envoku
   module_function
 
   def load(options = {})
-    @adapter = Envoku::Adapters.for(Envoku::Utils.parsed_uri)
-    @adapter.load!
+    adapter = Envoku::Adapters.for(Envoku::Utils.parsed_uri)
+    adapter.load!
+    @data = data.merge(adapter.data)
   end
 
-  def get_all
-    self.load
-    @adapter.get_all
+  def data
+    @data || {}
   end
 
   def get(key)
-    self.load
-    @adapter.get(key)
+    return nil unless @data
+    @data[key]
   end
 
   def set(key, value)
-    self.load
-    @adapter.set(key, value)
+    return nil unless @data
+    @data[key] = value
   end
 
   def redis

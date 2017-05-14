@@ -168,19 +168,6 @@ describe Envoku::Adapters::S3 do
     end
   end
 
-  describe "#get_all" do
-    it "returns @data" do
-      instance = Envoku::Adapters::S3.new
-      instance.instance_variable_set(:"@data", {"KEY" => "VALUE"})
-      expect(instance.get_all).to eq("KEY" => "VALUE")
-    end
-    it "returns @data" do
-      instance = Envoku::Adapters::S3.new
-      instance.instance_variable_set(:"@data", {})
-      expect(instance.get_all).to eq({})
-    end
-  end
-
   describe "#get" do
     it "returns @data[KEY]" do
       instance = Envoku::Adapters::S3.new

@@ -21,16 +21,6 @@ describe Envoku do
     end
   end
 
-  describe "::get_all" do
-    it "proxies to adapter" do
-      s3_adapter_mock = double
-      expect(Envoku::Adapters::S3).to receive(:new).and_return(s3_adapter_mock)
-      expect(s3_adapter_mock).to receive(:load)
-      expect(s3_adapter_mock).to receive(:get_all).and_return({"KEY" => "VALUE"})
-      expect(Envoku.get_all).to eq("KEY" => "VALUE")
-    end
-  end
-
   describe "::get" do
     it "proxies to adapter" do
       s3_adapter_mock = double
