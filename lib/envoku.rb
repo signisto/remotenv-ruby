@@ -2,6 +2,8 @@ require "redis"
 require "logger"
 
 require "envoku/version"
+require "envoku/adapters/base"
+require "envoku/adapters/http"
 require "envoku/adapters/s3"
 require "envoku/feature"
 require "envoku/logger"
@@ -20,25 +22,24 @@ module Envoku
   module_function
 
   def load(options = {})
-    Envoku.logger.info("load using S3 adapter")
-    instance = Envoku::Adapters::S3.new(options)
-    instance.load
+    adapter = Envoku::Adapters.for(Envoku::Utils.parsed_uri)
+    adapter.load
   end
 
   def get_all
-    adapter = Envoku::Adapters::S3.new
+    adapter = Envoku::Adapters.for(Envoku::Utils.parsed_uri)
     adapter.load
     adapter.get_all
   end
 
   def get(key)
-    adapter = Envoku::Adapters::S3.new
+    adapter = Envoku::Adapters.for(Envoku::Utils.parsed_uri)
     adapter.load
     adapter.get(key)
   end
 
   def set(key, value)
-    adapter = Envoku::Adapters::S3.new
+    adapter = Envoku::Adapters.for(Envoku::Utils.parsed_uri)
     adapter.load
     adapter.set(key, value)
   end

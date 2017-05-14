@@ -3,6 +3,7 @@ require 'yaml'
 
 namespace :envoku do
 
+  desc "Load Envoku variables"
   task :load do
     Envoku.load
   end
