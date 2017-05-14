@@ -12,7 +12,13 @@ module Envoku
         @data = {}
       end
 
-      # TODO: This needs to be triggered
+      def load!
+        Envoku.logger.debug("Adapter: #{self.class.name}")
+        before_load
+        load
+        after_load
+      end
+
       def before_load
       end
 
@@ -20,7 +26,6 @@ module Envoku
         raise "Envoku::Adapter::Base should not be used directly"
       end
 
-      # TODO: This needs to be triggered
       def after_load
         ENV['ENVOKU_REFRESHED_AT'] = Time.now.to_s
       end

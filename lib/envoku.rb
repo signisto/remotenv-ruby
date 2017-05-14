@@ -22,26 +22,23 @@ module Envoku
   module_function
 
   def load(options = {})
-    adapter = Envoku::Adapters.for(Envoku::Utils.parsed_uri)
-    adapter.load
+    @adapter = Envoku::Adapters.for(Envoku::Utils.parsed_uri)
+    @adapter.load!
   end
 
   def get_all
-    adapter = Envoku::Adapters.for(Envoku::Utils.parsed_uri)
-    adapter.load
-    adapter.get_all
+    self.load
+    @adapter.get_all
   end
 
   def get(key)
-    adapter = Envoku::Adapters.for(Envoku::Utils.parsed_uri)
-    adapter.load
-    adapter.get(key)
+    self.load
+    @adapter.get(key)
   end
 
   def set(key, value)
-    adapter = Envoku::Adapters.for(Envoku::Utils.parsed_uri)
-    adapter.load
-    adapter.set(key, value)
+    self.load
+    @adapter.set(key, value)
   end
 
   def redis

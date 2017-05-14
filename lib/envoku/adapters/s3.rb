@@ -33,12 +33,6 @@ module Envoku
         ]
         ::URI.parse("#{s3_direct_url}?#{query_params.join('&')}").to_s
       end
-
-      def load
-        Envoku.logger.debug("Loading via S3 Adapter")
-        return unless config['bucket_name'] && config['filename'] && config['access_key_id'] && config['secret_access_key']
-        super
-      end
     end
   end
 end

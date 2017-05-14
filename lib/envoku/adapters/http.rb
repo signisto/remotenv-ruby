@@ -15,8 +15,11 @@ module Envoku
         "/tmp/envoku.env"
       end
 
+      def before_load
+        FileUtils.rm(local_path) if File.exist?(local_path)
+      end
+
       def load
-        Envoku.logger.debug("Loading via Http Adapter")
         Envoku.logger.debug("Downloading \"#{remote_url}\"")
         return unless download_file
         @_env_before = ENV.to_h
@@ -33,8 +36,10 @@ module Envoku
             # @data[key] = value
           end
         end
-        FileUtils.rm(local_path)
-        ENV['ENVOKU_REFRESHED_AT'] = Time.now.to_s
+      end
+
+      def after_load
+        FileUtils.rm(local_path) if File.exist?(local_path)
       end
 
       def get_all
@@ -53,7 +58,6 @@ module Envoku
       private
 
       def download_file
-        FileUtils.rm(local_path) if File.exist?(local_path)
         remote_uri = URI(remote_url)
         response = Net::HTTP.get_response(remote_uri)
         if response.is_a?(Net::HTTPSuccess)
