@@ -80,6 +80,10 @@ module Envoku
         s3_response = Net::HTTP.get_response s3_signed_uri
         if s3_response.is_a? Net::HTTPSuccess
           File.write @local_file_name, s3_response.body
+          true
+        else
+          Envoku.logger.debug("could not get file #{s3_response.to_yaml}")
+          false
         end
       end
 
