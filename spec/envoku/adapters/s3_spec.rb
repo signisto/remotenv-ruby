@@ -7,6 +7,6 @@ describe Envoku::Adapters::S3 do
   describe "#config" do
   end
 
-  describe "#remote_url" do
+  describe "#remote_uri" do
   end
 end

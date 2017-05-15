@@ -6,7 +6,7 @@ describe Envoku::Adapters::Http do
 
   it { expect(adapter.is_a?(Envoku::Adapters::Base)).to eq(true) }
 
-  describe "#remote_url" do
+  describe "#remote_uri" do
   end
 
   describe "#load" do

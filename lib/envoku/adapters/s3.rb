@@ -23,9 +23,9 @@ module Envoku
         end
       end
 
-      def remote_url
+      def remote_uri
         return direct_s3_url unless (config['access_key_id'] && config['secret_access_key'])
-        signed_s3_url
+        URI(signed_s3_url)
       end
 
       def direct_s3_url
