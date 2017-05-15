@@ -46,6 +46,10 @@ describe Envoku::Adapters::S3 do
   end
 
   describe "#direct_s3_url" do
+    it "builds a basic http URL" do
+      adapter.instance_variable_set(:@_config, 'filename' => 'test.env', 'bucket_name' => 'example-bucket')
+      expect(adapter.send(:direct_s3_url)).to eq('https://example-bucket.s3.amazonaws.com/test.env')
+    end
   end
 
   describe "#signed_s3_url" do
