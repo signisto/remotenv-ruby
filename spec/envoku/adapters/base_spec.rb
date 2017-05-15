@@ -11,6 +11,7 @@ describe Envoku::Adapters::Base do
       expect(adapter).to receive(:load)
       expect(adapter).to receive(:after_load)
       expect(adapter).to receive(:apply_environment)
+      expect(adapter).to receive(:set_refresh_timestamp)
       adapter.load!
     end
   end
@@ -23,10 +24,17 @@ describe Envoku::Adapters::Base do
     end
   end
 
-  describe "#after_load" do
+  describe "#apply_environment" do
   end
 
-  describe "#apply_environment" do
+  describe "#set_refresh_timestamp" do
+    it "sets timestamps" do
+      time = Time.now.to_s
+      expect(Time).to receive(:now).and_return(time)
+      expect {
+        adapter.set_refresh_timestamp
+      }.to change { ENV['ENVOKU_REFRESHED_AT'] }.to time
+    end
   end
 
   describe "#get" do

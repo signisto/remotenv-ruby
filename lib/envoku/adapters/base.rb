@@ -20,6 +20,7 @@ module Envoku
         load
         after_load
         apply_environment
+        set_refresh_timestamp
       end
 
       def before_load
@@ -30,6 +31,9 @@ module Envoku
       end
 
       def after_load
+      end
+
+      def set_refresh_timestamp
         ENV['ENVOKU_REFRESHED_AT'] = Time.now.to_s
       end
 
