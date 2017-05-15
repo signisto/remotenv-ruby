@@ -32,10 +32,4 @@ module Envoku
     return nil unless @data
     @data[key]
   end
-
-  def redis
-    @redis ||= ::Redis.new(
-      url: (ENV['ENVOKU_REDIS_URL'] || ENV['REDIS_URL']),
-    )
-  end
 end

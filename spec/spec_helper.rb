@@ -11,8 +11,6 @@ RSpec.configure do |config|
       'ENVOKU_BUCKET',
       'ENVOKU_REFRESHED_AT',
       'ENVOKU_URL',
-      'ENVOKU_REDIS_URL',
-      'REDIS_URL',
       'LOG_LEVEL',
       'ENVOKU_LOG_LEVEL',
     ].each { |key| ENV.delete(key) }
