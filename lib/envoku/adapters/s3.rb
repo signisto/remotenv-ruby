@@ -2,6 +2,7 @@ require 'dotenv'
 require 'envoku/adapters'
 require 'fileutils'
 require 'net/http'
+require 'openssl'
 require 'base64'
 
 module Envoku
