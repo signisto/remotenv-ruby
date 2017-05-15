@@ -14,12 +14,6 @@ namespace :envoku do
     puts "URI: #{Envoku::URI.to_yaml}"
   end
 
-  desc "List Envoku Features"
-  task :features => :load do
-    features = Envoku::Feature.all
-    puts features.to_yaml
-  end
-
   desc "List all keys"
   task :list => :load do
     Envoku.data.each do |key, value|

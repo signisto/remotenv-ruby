@@ -1,13 +1,10 @@
-require "redis"
 require "logger"
 
 require "envoku/version"
 require "envoku/adapters/base"
 require "envoku/adapters/http"
 require "envoku/adapters/s3"
-require "envoku/feature"
 require "envoku/logger"
-require "envoku/resource"
 require "envoku/utils"
 
 Dotenv.load("#{Dir.pwd}/.env") if defined?(Dotenv) && ENV['RAILS_ENV'] != "test"

@@ -8,7 +8,7 @@
 
 **WIP:** This gem is currently under active development. Until **1.0** version backwards-incompatible changes may be introduced with each **0.x** minor version.
 
-Configuration and feature management that is pre-loaded into your application at boot-time.
+Configuration management that is pre-loaded into your application at boot-time.
 
 
 ## Installation
@@ -47,46 +47,9 @@ Envoku.load
 ```
 
 
-## Features
-
-Feature are defined as standard environment variables as YAML objects in the following format:
-
-``` shell
-ENVOKU_FEATURE_FEATURE1="description: 'Example feature', attribute1: 'something'"
-```
-
-``` ruby
-all_features = Envoku::Feature.all
-feature = Envoku::Feature.new('FEATURE1')
-feature.enabled? # global for all resources
-feature.enabled_for?(current_user) # does current_user have this feature enabled
-feature.enable_for!(current_user) # enable feature for current_user
-feature.disable_for!(current_user) # disable feature for current_user
-feature.attributes # {"attribute1" => "something"}
-feature.permitted_for?('User') # whether or not this feature is designed for a resource
-resource.feature_enabled?('FEATURE1')
-resource.toggle_feature!('FEATURE1')
-resource.features_enabled
-```
-
-By default, all features can be used against all resources. To restrict a feature to a certain resource:
-
-``` shell
-ENVOKU_FEATURE_FEATURE1="permitted_resources: 'Organization,User'"
-```
-
-Per-resource features are stored in Redis via the following keys:
-
-```
-(SET)  envoku:features:[feature]:[class] 123 456 789 # IDs for resource grouped by feature and class
-(SET)  envoku:features:[class]:[id] FEATURE1 FEATURE2 # Features grouped by resource and ID
-```
-
-
 ## Todo
 
 - ~~Logging~~
-- ~~Show warning when toggling features for non-permitted resources~~
 - Add `Envoku.configure {}` functionality
 
 
