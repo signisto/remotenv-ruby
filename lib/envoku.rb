@@ -36,11 +36,6 @@ module Envoku
     @data[key]
   end
 
-  def set(key, value)
-    return nil unless @data
-    @data[key] = value
-  end
-
   def redis
     @redis ||= ::Redis.new(
       url: (ENV['ENVOKU_REDIS_URL'] || ENV['REDIS_URL']),

@@ -180,8 +180,4 @@ describe Envoku::Adapters::S3 do
       expect(instance.get("KEY_2")).to eq(nil)
     end
   end
-
-  describe "#set" do
-    pending
-  end
 end
