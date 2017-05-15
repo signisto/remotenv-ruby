@@ -4,13 +4,7 @@ describe Envoku::Adapters::Http do
 
   it { expect(adapter.is_a?(Envoku::Adapters::Base)).to eq(true) }
 
-  describe "#local_path" do
-  end
-
   describe "#remote_url" do
-  end
-
-  describe "#before_load" do
   end
 
   describe "#load" do
@@ -18,9 +12,6 @@ describe Envoku::Adapters::Http do
       expect(adapter).to receive(:download_file)
       adapter.load
     end
-  end
-
-  describe "#after_load" do
   end
 
   describe "#download_file" do
