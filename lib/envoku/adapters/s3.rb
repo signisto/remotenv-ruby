@@ -22,6 +22,7 @@ module Envoku
 
       def remote_url
         s3_direct_url = "https://#{config['bucket_name']}.s3.amazonaws.com/#{config['filename']}"
+        return s3_direct_url unless (config['access_key_id'] && config['secret_access_key'])
         s3_resource = "/#{config['bucket_name']}/#{config['filename']}"
         s3_expires_at = Time.now + 300
         signature_payload = "GET\n\n\n#{s3_expires_at.to_i}\n#{s3_resource}"

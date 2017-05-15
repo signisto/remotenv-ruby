@@ -11,7 +11,7 @@ module Envoku
       end
 
       def load
-        Envoku.logger.debug("Downloading \"#{remote_url}\"")
+        Envoku.logger.debug("Downloading HTTP File: #{remote_url}")
         download_file
       end
 
@@ -19,12 +19,12 @@ module Envoku
 
       def download_file
         remote_uri = URI(remote_url)
-        response = Net::HTTP.get_response(remote_uri)
+        response = Net::HTTP.get_response(remote_uri) rescue nil
         if response.is_a?(Net::HTTPSuccess)
           @content = response.body
           true
         else
-          Envoku.logger.debug("could not get file #{sresponse.to_yaml}")
+          Envoku.logger.error("Error Downloading HTTP File: #{remote_url}")
           false
         end
       end
