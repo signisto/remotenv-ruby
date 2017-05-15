@@ -38,8 +38,9 @@ module Envoku
       end
 
       def apply_environment
-        Envoku.logger.debug("Applying ENV vars")
+        Envoku.logger.debug("Applying environment variables")
         @data = Dotenv::Parser.call(@content)
+        Envoku.logger.debug("ENV: #{@data.keys.join(', ')}")
         @data.each do |key, value|
           ENV[key] ||= value
         end

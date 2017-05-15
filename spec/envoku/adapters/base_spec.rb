@@ -25,6 +25,23 @@ describe Envoku::Adapters::Base do
   end
 
   describe "#apply_environment" do
+    before do
+      ENV.delete('key1')
+      ENV.delete('KEY_2')
+      adapter.instance_variable_set(:@content, "key1=value1\nKEY_2=\"SECOND KEY\"")
+    end
+
+    it "sets ENV[key1]" do
+      expect {
+        adapter.apply_environment
+      }.to change { ENV['key1'] }.to 'value1'
+    end
+
+    it "sets ENV[KEY_2]" do
+      expect {
+        adapter.apply_environment
+      }.to change { ENV['KEY_2'] }.to 'SECOND KEY'
+    end
   end
 
   describe "#set_refresh_timestamp" do
