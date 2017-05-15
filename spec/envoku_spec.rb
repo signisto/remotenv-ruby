@@ -14,6 +14,22 @@ describe Envoku do
     end
   end
 
+  describe "::uri" do
+    it "proxies to utils helper" do
+      uri = URI('http://example.com/test.env')
+      expect(Envoku::Utils).to receive(:parsed_uri).and_return(uri)
+      expect(Envoku.uri).to eq(uri)
+    end
+  end
+
+  describe "::url" do
+    it "proxies to utils helper" do
+      url = 'http://example.com/test.env'
+      expect(Envoku::Utils).to receive(:parsed_url).and_return(url)
+      expect(Envoku.url).to eq(url)
+    end
+  end
+
   describe "::load" do
     it "loads environment via adatper" do
       adapter_mock = double
