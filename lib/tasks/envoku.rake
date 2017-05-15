@@ -10,8 +10,8 @@ namespace :envoku do
 
   desc "Show Envoku Info"
   task :info => :load do
-    puts "URL: #{Envoku::URL || '[not set]'}"
-    puts "URI: #{Envoku::URI.to_yaml}"
+    puts "URL: #{Envoku.uri || '[not set]'}"
+    puts "URI: #{Envoku.url.to_yaml}"
   end
 
   desc "List all keys"

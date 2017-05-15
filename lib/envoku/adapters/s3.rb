@@ -13,19 +13,23 @@ module Envoku
 
       def config
         @_config ||= begin
-          return {} unless Envoku::URI && Envoku::URI.host && Envoku::URI.path && Envoku::URI.user && Envoku::URI.password
+          uri = Envoku.uri
+          return {} unless uri && uri.host && uri.path && uri.user && uri.password
           {
-            'filename' => Envoku::URI.path[1..-1],
-            'bucket_name' => Envoku::URI.host,
-            'access_key_id' => Envoku::URI.user,
-            'secret_access_key' => ::URI.unescape(Envoku::URI.password),
+            'filename' => uri.path[1..-1],
+            'bucket_name' => uri.host,
+            'access_key_id' => uri.user,
+            'secret_access_key' => ::URI.unescape(uri.password),
           }
         end
       end
 
       def remote_uri
-        return URI(direct_s3_url) unless (config['access_key_id'] && config['secret_access_key'])
-        URI(signed_s3_url)
+         if config['access_key_id'] && config['secret_access_key']
+           URI(signed_s3_url)
+         else
+           URI(direct_s3_url)
+         end
       end
 
       def direct_s3_url

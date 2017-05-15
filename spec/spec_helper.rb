@@ -14,8 +14,6 @@ RSpec.configure do |config|
       'LOG_LEVEL',
       'ENVOKU_LOG_LEVEL',
     ].each { |key| ENV.delete(key) }
-    stub_const("Envoku::URL", nil)
-    stub_const("Envoku::URI", nil)
     Envoku.logger = nil
     Envoku.logger.level = :fatal
   end

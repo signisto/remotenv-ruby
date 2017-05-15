@@ -12,14 +12,18 @@ Dotenv.load("#{Dir.pwd}/.env") if defined?(Dotenv) && ENV['RAILS_ENV'] != "test"
 require "envoku/rails" if defined?(Rails)
 
 module Envoku
-
-  URL = Envoku::Utils.parsed_url
-  URI = Envoku::Utils.parsed_uri
-
   module_function
 
+  def url
+    @_url ||= Envoku::Utils.parsed_url
+  end
+
+  def uri
+    @_uri ||= Envoku::Utils.parsed_uri
+  end
+
   def load(options = {})
-    adapter = Envoku::Adapters.for(Envoku::Utils.parsed_uri)
+    adapter = Envoku::Adapters.for(self.uri)
     adapter.load!
     @data = data.merge(adapter.data)
   end
