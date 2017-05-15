@@ -8,6 +8,9 @@ require 'base64'
 module Envoku
   module Adapters
     class S3 < Http
+
+      private
+
       def config
         @_config ||= begin
           return {} unless Envoku::URI && Envoku::URI.host && Envoku::URI.path && Envoku::URI.user && Envoku::URI.password

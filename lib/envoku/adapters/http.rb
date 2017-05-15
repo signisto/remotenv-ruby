@@ -6,10 +6,6 @@ require 'net/http'
 module Envoku
   module Adapters
     class Http < Base
-      def remote_url
-        @uri.to_s
-      end
-
       def load
         Envoku.logger.debug("Downloading HTTP File: #{remote_url}")
         download_file
@@ -17,16 +13,19 @@ module Envoku
 
       private
 
+      def remote_url
+        @uri.to_s
+      end
+
       def download_file
+        @content = http_get_content
+        Envoku.logger.error("Error Downloading HTTP File: #{remote_url}") unless @content
+      end
+
+      def http_get_content
         remote_uri = URI(remote_url)
         response = Net::HTTP.get_response(remote_uri) rescue nil
-        if response.is_a?(Net::HTTPSuccess)
-          @content = response.body
-          true
-        else
-          Envoku.logger.error("Error Downloading HTTP File: #{remote_url}")
-          false
-        end
+        response.body if response.is_a?(Net::HTTPSuccess)
       end
     end
   end

@@ -11,7 +11,7 @@ module Envoku
         @uri = uri
         @options = options
         @data = {}
-        @content = ""
+        @content = nil
       end
 
       def load!

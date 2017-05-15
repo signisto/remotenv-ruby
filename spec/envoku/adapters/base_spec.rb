@@ -1,5 +1,5 @@
 describe Envoku::Adapters::Base do
-  let!(:uri) { "http://example.com/test.env" }
+  let!(:uri) { URI("http://example.com/test.env") }
   let!(:adapter) { described_class.new(uri) }
 
   describe "#initialize" do
