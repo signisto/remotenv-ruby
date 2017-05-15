@@ -1,10 +1,33 @@
 describe Envoku::Adapters::S3 do
-  let!(:uri) { URI("http://example.com/test.env") }
+  let!(:uri) { URI("s3://example-bucket/test.env") }
   let!(:adapter) { described_class.new(uri) }
 
   it { expect(adapter.is_a?(Envoku::Adapters::Http)).to eq(true) }
 
   describe "#config" do
+    it "returns nil if URI is not valid" do
+      expect(Envoku).to receive(:uri).and_return(nil)
+      expect(adapter.send(:config)).to eq({})
+    end
+
+    it "returns hash with basic details" do
+      expect(Envoku).to receive(:uri).and_return(uri)
+      expect(adapter.send(:config)).to eq({
+        'filename' => 'test.env',
+        'bucket_name' => 'example-bucket',
+      })
+    end
+
+    it "returns hash with auth details" do
+      uri = URI("s3://abc123:XXX@example-bucket/test.env")
+      expect(Envoku).to receive(:uri).and_return(uri)
+      expect(adapter.send(:config)).to eq({
+        'filename' => 'test.env',
+        'bucket_name' => 'example-bucket',
+        'access_key_id' => 'abc123',
+        'secret_access_key' => 'XXX',
+      })
+    end
   end
 
   describe "#remote_uri" do

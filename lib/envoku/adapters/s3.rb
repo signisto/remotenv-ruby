@@ -14,13 +14,13 @@ module Envoku
       def config
         @_config ||= begin
           uri = Envoku.uri
-          return {} unless uri && uri.host && uri.path && uri.user && uri.password
+          return {} unless uri && uri.host && uri.path
           {
             'filename' => uri.path[1..-1],
             'bucket_name' => uri.host,
             'access_key_id' => uri.user,
-            'secret_access_key' => ::URI.unescape(uri.password),
-          }
+            'secret_access_key' => uri.password ? ::URI.unescape(uri.password) : nil,
+          }.compact
         end
       end
 
