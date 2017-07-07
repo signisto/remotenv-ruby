@@ -49,8 +49,14 @@ Remotenv.load
 
 ## Todo
 
-- ~~Logging~~
+Below are the main features that will ideally be implemented before v1.0.
+Contributions welcome.
+
+- Local caching to protect against network errors
+- Ordered override behaviour for more fine grained control
+- Require/Desire to aid developer knowledge of configurations
 - Add `Remotenv.configure {}` functionality
+- Encrypted variables
 
 
 ## Development
