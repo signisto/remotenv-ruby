@@ -3,7 +3,6 @@ require 'simplecov'
 require 'remotenv'
 
 RSpec.configure do |config|
-
   config.before :each do
     [
       'AWS_ACCESS_KEY_ID',
@@ -16,5 +15,6 @@ RSpec.configure do |config|
     ].each { |key| ENV.delete(key) }
     Remotenv.logger = nil
     Remotenv.logger.level = :fatal
+    Remotenv.instance_variable_set(:@data, nil)
   end
 end
