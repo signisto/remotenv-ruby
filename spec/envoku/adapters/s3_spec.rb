@@ -1,3 +1,5 @@
+require 'rack/utils'
+
 describe Envoku::Adapters::S3 do
   let!(:uri) { URI("s3://example-bucket/test.env") }
   let!(:adapter) { described_class.new(uri) }
@@ -53,5 +55,22 @@ describe Envoku::Adapters::S3 do
   end
 
   describe "#signed_s3_url" do
+    it "constructs a signed URL" do
+      config = {
+        'filename' => 'test.env',
+        'bucket_name' => 'example-bucket',
+        'access_key_id' => 'test_ACCESSKEYID',
+        'secret_access_key' => 'test_SECRETACCESSKEY',
+      }
+      adapter.instance_variable_set(:@_config, config)
+      signed_s3_url = adapter.send(:signed_s3_url)
+      signed_s3_uri = URI(signed_s3_url)
+      signed_s3_query_params = Rack::Utils.parse_nested_query(signed_s3_uri.query)
+      expect(signed_s3_uri.host).to eq('example-bucket.s3.amazonaws.com')
+      expect(signed_s3_uri.path).to eq('/test.env')
+      expect(signed_s3_query_params['AWSAccessKeyId']).to eq('test_ACCESSKEYID')
+      expect(signed_s3_query_params['Expires'].to_i).to be_between(Time.now.to_i + 60, Time.now.to_i + 300)
+      expect(signed_s3_query_params['Signature']).to_not be_nil
+    end
   end
 end
