@@ -23,6 +23,7 @@ module Remotenv
   end
 
   def load(options = {})
+    return unless self.uri
     adapter = Remotenv::Adapters.for(self.uri)
     adapter.load!
     @data = data.merge(adapter.data)

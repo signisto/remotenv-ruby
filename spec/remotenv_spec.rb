@@ -39,6 +39,12 @@ describe Remotenv do
       Remotenv.load
       expect(Remotenv.data).to eq('adapter_key' => 'adapter_value')
     end
+
+    it "shouldn't fail when there is no REMOTENV_URL" do
+      expect(Remotenv).to receive(:uri).and_return(nil)
+      Remotenv.load
+      expect(Remotenv.data).to eq({})
+    end
   end
 
   describe "::get" do
