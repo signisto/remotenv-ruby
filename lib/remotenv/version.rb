@@ -1,3 +1,3 @@
-module Envoku
+module Remotenv
   VERSION = "0.3.0"
 end

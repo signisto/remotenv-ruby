@@ -8,5 +8,5 @@ SimpleCov.formatter = SimpleCov::Formatter::MultiFormatter.new([
 ].compact)
 SimpleCov.start do
   add_filter "spec"
-  add_group "Adapters", "lib/envoku/adapters/"
+  add_group "Adapters", "lib/remotenv/adapters/"
 end

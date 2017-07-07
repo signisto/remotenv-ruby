@@ -1,11 +1,12 @@
+require 'cgi'
 require 'dotenv'
-require 'envoku/adapters'
+require 'remotenv/adapters'
 require 'fileutils'
 require 'net/http'
 require 'openssl'
 require 'base64'
 
-module Envoku
+module Remotenv
   module Adapters
     class S3 < Http
 
@@ -13,7 +14,7 @@ module Envoku
 
       def config
         @_config ||= begin
-          uri = Envoku.uri
+          uri = Remotenv.uri
           return {} unless uri && uri.host && uri.path
           {
             'filename' => uri.path[1..-1],

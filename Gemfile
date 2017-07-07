@@ -1,4 +1,4 @@
 source 'https://rubygems.org'
 
-# Specify your gem's dependencies in envoku.gemspec
+# Specify your gem's dependencies in remotenv.gemspec
 gemspec

@@ -1,16 +1,16 @@
-require "envoku"
+require "remotenv"
 
-module Envoku
-  # Envoku Railtie for using Envoku to load environment before application is loaded
+module Remotenv
+  # Remotenv Railtie for using Remotenv to load environment before application is loaded
   class Railtie < Rails::Railtie
     config.before_configuration { load }
 
-    # Public: Load Envoku
+    # Public: Load Remotenv
     #
     # This will get called during the `before_configuration` callback, but you
-    # can manually call `Envoku::Railtie.load` if you needed it sooner.
+    # can manually call `Remotenv::Railtie.load` if you needed it sooner.
     def load
-      Envoku.load
+      Remotenv.load
     end
 
     # Rails uses `#method_missing` to delegate all class methods to the
@@ -21,7 +21,7 @@ module Envoku
 
     # Rake tasks
     rake_tasks do
-      Rails::Railtie.instance_method(:load).bind(self).call("tasks/envoku.rake")
+      Rails::Railtie.instance_method(:load).bind(self).call("tasks/remotenv.rake")
     end
   end
 end

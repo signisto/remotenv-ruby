@@ -1,6 +1,6 @@
 $LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
 require 'simplecov'
-require 'envoku'
+require 'remotenv'
 
 RSpec.configure do |config|
 
@@ -8,13 +8,13 @@ RSpec.configure do |config|
     [
       'AWS_ACCESS_KEY_ID',
       'AWS_SECRET_ACCESS_KEY',
-      'ENVOKU_BUCKET',
-      'ENVOKU_REFRESHED_AT',
-      'ENVOKU_URL',
+      'REMOTENV_BUCKET',
+      'REMOTENV_REFRESHED_AT',
+      'REMOTENV_URL',
       'LOG_LEVEL',
-      'ENVOKU_LOG_LEVEL',
+      'REMOTENV_LOG_LEVEL',
     ].each { |key| ENV.delete(key) }
-    Envoku.logger = nil
-    Envoku.logger.level = :fatal
+    Remotenv.logger = nil
+    Remotenv.logger.level = :fatal
   end
 end

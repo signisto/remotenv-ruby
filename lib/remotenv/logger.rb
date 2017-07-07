@@ -1,11 +1,11 @@
 require "logger"
 
-module Envoku
+module Remotenv
 
   module_function
 
   def logger
-    @_logger ||= Envoku::Logger.new(STDOUT)
+    @_logger ||= Remotenv::Logger.new(STDOUT)
   end
 
   def logger=(logger)
@@ -15,8 +15,8 @@ module Envoku
   class Logger < ::Logger
     def initialize(*args)
       super
-      @progname = "envoku"
-      log_level = (ENV["ENVOKU_LOG_LEVEL"] || ENV["LOG_LEVEL"] || "").upcase
+      @progname = "remotenv"
+      log_level = (ENV["REMOTENV_LOG_LEVEL"] || ENV["LOG_LEVEL"] || "").upcase
       @level = ["DEBUG", "INFO", "WARN", "ERROR", "FATAL", "UNKNOWN"].index(log_level) != nil ? Logger.const_get(log_level) : Logger::INFO
     end
   end

@@ -1,14 +1,14 @@
-# Envoku
+# Remotenv
 
-[![Gem Version](https://badge.fury.io/rb/envoku.svg)](https://badge.fury.io/rb/envoku)
-[![Circle CI](https://circleci.com/gh/marcqualie/envoku-ruby/tree/master.svg?style=shield)](https://circleci.com/gh/marcqualie/envoku-ruby/tree/master)
-[![Test Coverage](https://codeclimate.com/github/marcqualie/envoku-ruby/badges/coverage.svg)](https://codeclimate.com/github/marcqualie/envoku-ruby/coverage)
-[![Code Climate](https://codeclimate.com/github/marcqualie/envoku-ruby/badges/gpa.svg)](https://codeclimate.com/github/marcqualie/envoku-ruby)
-[![Issue Count](https://codeclimate.com/github/marcqualie/envoku-ruby/badges/issue_count.svg)](https://codeclimate.com/github/marcqualie/envoku-ruby)
+[![Gem Version](https://badge.fury.io/rb/remotenv.svg)](https://badge.fury.io/rb/remotenv)
+[![Circle CI](https://circleci.com/gh/marcqualie/remotenv-ruby/tree/master.svg?style=shield)](https://circleci.com/gh/marcqualie/remotenv-ruby/tree/master)
+[![Test Coverage](https://codeclimate.com/github/marcqualie/remotenv-ruby/badges/coverage.svg)](https://codeclimate.com/github/marcqualie/remotenv-ruby/coverage)
+[![Code Climate](https://codeclimate.com/github/marcqualie/remotenv-ruby/badges/gpa.svg)](https://codeclimate.com/github/marcqualie/remotenv-ruby)
+[![Issue Count](https://codeclimate.com/github/marcqualie/remotenv-ruby/badges/issue_count.svg)](https://codeclimate.com/github/marcqualie/remotenv-ruby)
+
+Securely store environment variables away from your application
 
 **WIP:** This gem is currently under active development. Until **1.0** version backwards-incompatible changes may be introduced with each **0.x** minor version.
-
-Configuration management that is pre-loaded into your application at boot-time.
 
 
 ## Installation
@@ -16,7 +16,7 @@ Configuration management that is pre-loaded into your application at boot-time.
 Add this line to your application's Gemfile:
 
 ``` ruby
-gem 'envoku'
+gem 'remotenv'
 ```
 
 And then execute:
@@ -26,12 +26,12 @@ And then execute:
 
 ## Usage
 
-When Envoku is loaded it automatically uses Dotenv in the background to preload and other configuration mechanisms you may have to make transitioning seamless.
+When Remotenv is loaded it automatically uses Dotenv in the background to preload and other configuration mechanisms you may have to make transitioning seamless.
 
 
 ### Rails
 
-Envoku automatically pre-loads itself during `before_configuration` phase so no configuration is required.
+Remotenv automatically pre-loads itself during `before_configuration` phase so no configuration is required.
 
 ### Sinatra
 
@@ -43,14 +43,14 @@ Use the plain ruby method as early as possible, before any `ENV` variables are a
 Run the following code before you need access to the environment variables
 
 ``` ruby
-Envoku.load
+Remotenv.load
 ```
 
 
 ## Todo
 
 - ~~Logging~~
-- Add `Envoku.configure {}` functionality
+- Add `Remotenv.configure {}` functionality
 
 
 ## Development
@@ -62,4 +62,4 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/marcqualie/envoku-ruby.
+Bug reports and pull requests are welcome on GitHub at https://github.com/marcqualie/remotenv-ruby.

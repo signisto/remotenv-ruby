@@ -1,6 +1,6 @@
-require 'envoku/adapters'
+require 'remotenv/adapters'
 
-module Envoku
+module Remotenv
   module Adapters
     class Base
       attr_reader :uri
@@ -15,7 +15,7 @@ module Envoku
       end
 
       def load!
-        Envoku.logger.debug("Adapter: #{self.class.name}")
+        Remotenv.logger.debug("Adapter: #{self.class.name}")
         before_load
         load
         after_load
@@ -27,20 +27,20 @@ module Envoku
       end
 
       def load
-        raise "Envoku::Adapter::Base should not be used directly"
+        raise "Remotenv::Adapter::Base should not be used directly"
       end
 
       def after_load
       end
 
       def set_refresh_timestamp
-        ENV['ENVOKU_REFRESHED_AT'] = Time.now.to_s
+        ENV['REMOTENV_REFRESHED_AT'] = Time.now.to_s
       end
 
       def apply_environment
-        Envoku.logger.debug("Applying environment variables")
+        Remotenv.logger.debug("Applying environment variables")
         @data = Dotenv::Parser.call(@content)
-        Envoku.logger.debug("ENV: #{@data.keys.join(', ')}")
+        Remotenv.logger.debug("ENV: #{@data.keys.join(', ')}")
         @data.each do |key, value|
           ENV[key] ||= value
         end

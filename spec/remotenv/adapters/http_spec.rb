@@ -1,10 +1,10 @@
 require 'net/http'
 
-describe Envoku::Adapters::Http do
+describe Remotenv::Adapters::Http do
   let!(:uri) { URI("http://example.com/test.env") }
   let!(:adapter) { described_class.new(uri) }
 
-  it { expect(adapter.is_a?(Envoku::Adapters::Base)).to eq(true) }
+  it { expect(adapter.is_a?(Remotenv::Adapters::Base)).to eq(true) }
 
   describe "#remote_uri" do
   end

@@ -1,4 +1,4 @@
-describe Envoku::Adapters::Base do
+describe Remotenv::Adapters::Base do
   let!(:uri) { URI("http://example.com/test.env") }
   let!(:adapter) { described_class.new(uri) }
 
@@ -20,7 +20,7 @@ describe Envoku::Adapters::Base do
     it "raises exception when not extended" do
       expect {
         adapter.load
-      }.to raise_error('Envoku::Adapter::Base should not be used directly')
+      }.to raise_error('Remotenv::Adapter::Base should not be used directly')
     end
   end
 
@@ -50,7 +50,7 @@ describe Envoku::Adapters::Base do
       expect(Time).to receive(:now).and_return(time)
       expect {
         adapter.set_refresh_timestamp
-      }.to change { ENV['ENVOKU_REFRESHED_AT'] }.to time
+      }.to change { ENV['REMOTENV_REFRESHED_AT'] }.to time
     end
   end
 
