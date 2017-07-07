@@ -1,11 +1,10 @@
-require "redis"
 require "logger"
 
 require "envoku/version"
+require "envoku/adapters/base"
+require "envoku/adapters/http"
 require "envoku/adapters/s3"
-require "envoku/feature"
 require "envoku/logger"
-require "envoku/resource"
 require "envoku/utils"
 
 Dotenv.load("#{Dir.pwd}/.env") if defined?(Dotenv) && ENV['RAILS_ENV'] != "test"
@@ -13,39 +12,28 @@ Dotenv.load("#{Dir.pwd}/.env") if defined?(Dotenv) && ENV['RAILS_ENV'] != "test"
 require "envoku/rails" if defined?(Rails)
 
 module Envoku
-
-  URL = Envoku::Utils.parsed_url
-  URI = Envoku::Utils.parsed_uri
-
   module_function
 
-  def load(options = {})
-    Envoku.logger.info("load using S3 adapter")
-    instance = Envoku::Adapters::S3.new(options)
-    instance.load
+  def url
+    @_url ||= Envoku::Utils.parsed_url
   end
 
-  def get_all
-    adapter = Envoku::Adapters::S3.new
-    adapter.load
-    adapter.get_all
+  def uri
+    @_uri ||= Envoku::Utils.parsed_uri
+  end
+
+  def load(options = {})
+    adapter = Envoku::Adapters.for(self.uri)
+    adapter.load!
+    @data = data.merge(adapter.data)
+  end
+
+  def data
+    @data || {}
   end
 
   def get(key)
-    adapter = Envoku::Adapters::S3.new
-    adapter.load
-    adapter.get(key)
-  end
-
-  def set(key, value)
-    adapter = Envoku::Adapters::S3.new
-    adapter.load
-    adapter.set(key, value)
-  end
-
-  def redis
-    @redis ||= ::Redis.new(
-      url: (ENV['ENVOKU_REDIS_URL'] || ENV['REDIS_URL']),
-    )
+    return nil unless @data
+    @data[key]
   end
 end

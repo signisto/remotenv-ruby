@@ -1,200 +1,76 @@
-require 'envoku/adapters/s3'
-require 'dotenv'
-require 'fileutils'
+require 'rack/utils'
 
 describe Envoku::Adapters::S3 do
+  let!(:uri) { URI("s3://example-bucket/test.env") }
+  let!(:adapter) { described_class.new(uri) }
 
-  describe "#initialize" do
-    it "sets options variable" do
-      options = { test: 1, bucket_name: 'test' }
-      instance = Envoku::Adapters::S3.new options
-      expect(instance.instance_variable_get :'@options').to eq OpenStruct.new(
-        test: 1,
-        filename: nil,
-        bucket_name: 'test',
-        access_key_id: nil,
-        secret_access_key: nil,
-      )
+  it { expect(adapter.is_a?(Envoku::Adapters::Http)).to eq(true) }
+
+  describe "#config" do
+    it "returns nil if URI is not valid" do
+      expect(Envoku).to receive(:uri).and_return(nil)
+      expect(adapter.send(:config)).to eq({})
     end
-    it "sets local_file_name variable" do
-      instance = Envoku::Adapters::S3.new
-      expect(instance.instance_variable_get :'@local_file_name').not_to be nil
+
+    it "returns hash with basic details" do
+      expect(Envoku).to receive(:uri).and_return(uri)
+      expect(adapter.send(:config)).to eq({
+        'filename' => 'test.env',
+        'bucket_name' => 'example-bucket',
+      })
+    end
+
+    it "returns hash with auth details" do
+      uri = URI("s3://abc123:XXX@example-bucket/test.env")
+      expect(Envoku).to receive(:uri).and_return(uri)
+      expect(adapter.send(:config)).to eq({
+        'filename' => 'test.env',
+        'bucket_name' => 'example-bucket',
+        'access_key_id' => 'abc123',
+        'secret_access_key' => 'XXX',
+      })
     end
   end
 
-  describe "#load" do
-    context "when options are missing" do
-      it "nothing is loaded" do
-        expect_any_instance_of(Envoku::Adapters::S3).to receive(:apply_environment_options)
-        instance = Envoku::Adapters::S3.new
-        expect(instance).to receive(:options).and_return OpenStruct.new
-        expect(FileUtils).not_to receive(:rm)
-        expect(instance).not_to receive(:clone_s3_file)
-        instance.load
-        expect(instance.instance_variable_get(:"@data")).to eq({})
-        expect(ENV['ENVOKU_REFRESHED_AT']).to be nil
-      end
+  describe "#remote_uri" do
+    it "returns direct_s3_url if not access tokens" do
+      direct_url = 'http://s3.amazonaws.com/direct_s3_url'
+      expect(adapter).to receive(:direct_s3_url).and_return(direct_url)
+      expect(adapter.send(:remote_uri)).to eq(URI(direct_url))
     end
-    context "when file clones correctly" do
-      it "loads the environment" do
-        expect_any_instance_of(Envoku::Adapters::S3).to receive(:apply_environment_options)
-        local_file_name = "/tmp/envoku-test.env"
-        instance = Envoku::Adapters::S3.new
-        instance.instance_variable_set :'@local_file_name', local_file_name
-        expect(instance).to receive(:options).at_least(:once).and_return(OpenStruct.new bucket_name: 'test', filename: 'test.env', access_key_id: 'XXX', secret_access_key: 'XXXXX')
-        expect(instance).to receive(:clone_s3_file).and_return(true)
-        expect(Dotenv).to receive(:load).with(local_file_name) do
-          {"KEY2" => "VALUE2"}
-        end
-        expect(FileUtils).to receive(:rm).with(local_file_name)
-        instance.load
-        expect(instance.instance_variable_get(:"@data")).to eq("KEY2" => "VALUE2")
-        expect(ENV['ENVOKU_REFRESHED_AT']).not_to be nil
-      end
-    end
-    context "when s3 clone fails" do
-      it "loads the environment" do
-        expect_any_instance_of(Envoku::Adapters::S3).to receive(:apply_environment_options)
-        local_file_name = "/tmp/envoku-test.env"
-        instance = Envoku::Adapters::S3.new
-        instance.instance_variable_set :'@local_file_name', local_file_name
-        expect(instance).to receive(:options).at_least(:once).and_return(OpenStruct.new bucket_name: 'test', filename: 'test.env', access_key_id: 'XXX', secret_access_key: 'XXXXX')
-        expect(instance).to receive(:clone_s3_file).and_return(false)
-        expect(Dotenv).not_to receive(:load)
-        expect(FileUtils).not_to receive(:rm)
-        instance.load
-        expect(ENV['ENVOKU_REFRESHED_AT']).to be nil
-      end
+
+    it "returns signed_s3_url it access tokens are present" do
+      adapter.instance_variable_set(:@_config, 'access_key_id' => '123', 'secret_access_key' => 'XXX')
+      signed_url = 'http://s3.amazonaws.com/signed_s3_url'
+      expect(adapter).to receive(:signed_s3_url).and_return(signed_url)
+      expect(adapter.send(:remote_uri)).to eq(URI(signed_url))
     end
   end
 
-  describe "#options" do
-    def set_envoku_url(value)
-      ENV['ENVOKU_URL'] = value
-      stub_const("Envoku::URL", value)
-      stub_const("Envoku::URI", Envoku::Utils.parsed_uri)
-    end
-    def set_default_aws_keys
-      ENV['ENVOKU_BUCKET'] = "ENVOKU_BUCKET"
-      ENV['AWS_ACCESS_KEY_ID'] = "AWS_ACCESS_KEY_ID"
-      ENV['AWS_SECRET_ACCESS_KEY'] = "AWS_SECRET_ACCESS_KEY"
-    end
-    def set_envoku_aws_keys
-      ENV['ENVOKU_BUCKET'] = "ENVOKU_BUCKET"
-      ENV['ENVOKU_ACCESS_KEY_ID'] = "ENVOKU_ACCESS_KEY_ID"
-      ENV['ENVOKU_SECRET_ACCESS_KEY'] = "ENVOKU_SECRET_ACCESS_KEY"
-    end
-    let(:instance) { Envoku::Adapters::S3.new }
-
-    context "when ENVOKU_URL is not set" do
-      context "when no keys are set" do
-        it "returns no options" do
-          instance.send(:apply_environment_options)
-          expect(instance.options).to eq OpenStruct.new(filename: nil, bucket_name: nil, access_key_id: nil, secret_access_key: nil)
-        end
-      end
-      context "when default AWS keys are set" do
-        it "uses default keys" do
-          set_default_aws_keys
-          instance.send(:apply_environment_options)
-          expect(instance.options.access_key_id).to eq "AWS_ACCESS_KEY_ID"
-          expect(instance.options.secret_access_key).to eq "AWS_SECRET_ACCESS_KEY"
-        end
-      end
-      context "when Envoku AWS keys are set" do
-        it "overrides default keys" do
-          set_default_aws_keys
-          set_envoku_aws_keys
-          instance.send(:apply_environment_options)
-          expect(instance.options.access_key_id).to eq "ENVOKU_ACCESS_KEY_ID"
-          expect(instance.options.secret_access_key).to eq "ENVOKU_SECRET_ACCESS_KEY"
-        end
-      end
-      context "when options are passed" do
-        it "overrides default and envoku keys" do
-          set_default_aws_keys
-          set_envoku_aws_keys
-          instance = Envoku::Adapters::S3.new(
-            bucket_name: 'test-bucket',
-            access_key_id: 'test-access-key-id',
-            secret_access_key: 'test-secret-access-key',
-          )
-          instance.send(:apply_environment_options)
-          expect(instance.options.bucket_name).to eq 'test-bucket'
-          expect(instance.options.access_key_id).to eq "test-access-key-id"
-          expect(instance.options.secret_access_key).to eq "test-secret-access-key"
-        end
-      end
-    end
-
-    context "ENVOKU_URL is set" do
-      context "and is invalid" do
-        it "returns no options" do
-          set_default_aws_keys
-          set_envoku_aws_keys
-          set_envoku_url("s3_amazonaws_com")
-          instance.send(:apply_environment_options)
-          expect(instance.options).to eq OpenStruct.new(bucket_name: nil, filename: nil, access_key_id: nil, secret_access_key: nil)
-        end
-      end
-      context "and is valid" do
-        it "overrides all other keys" do
-          set_default_aws_keys
-          set_envoku_aws_keys
-          set_envoku_url("s3://URL_ACCESS_KEY_ID:URL_SECRET_ACCES_KEY@url-bucket-name/url-filename.env")
-          instance.send(:apply_environment_options)
-          expect(instance.options.filename).to eq 'url-filename.env'
-          expect(instance.options.bucket_name).to eq 'url-bucket-name'
-          expect(instance.options.access_key_id).to eq "URL_ACCESS_KEY_ID"
-          expect(instance.options.secret_access_key).to eq "URL_SECRET_ACCES_KEY"
-        end
-      end
-      context "and options are passed" do
-        it "overrides ENVOKU_URL keys" do
-          set_default_aws_keys
-          set_envoku_aws_keys
-          set_envoku_url("s3://URL_ACCESS_KEY_ID:URL_SECRET_ACCES_KEY@url-bucket-name/url-filename.env")
-          instance = Envoku::Adapters::S3.new(
-            bucket_name: 'test-bucket',
-            access_key_id: 'test-access-key-id',
-            secret_access_key: 'test-secret-access-key',
-          )
-          instance.send(:apply_environment_options)
-          expect(instance.options.bucket_name).to eq 'test-bucket'
-          expect(instance.options.access_key_id).to eq "test-access-key-id"
-          expect(instance.options.secret_access_key).to eq "test-secret-access-key"
-        end
-      end
+  describe "#direct_s3_url" do
+    it "builds a basic http URL" do
+      adapter.instance_variable_set(:@_config, 'filename' => 'test.env', 'bucket_name' => 'example-bucket')
+      expect(adapter.send(:direct_s3_url)).to eq('https://example-bucket.s3.amazonaws.com/test.env')
     end
   end
 
-  describe "#get_all" do
-    it "returns @data" do
-      instance = Envoku::Adapters::S3.new
-      instance.instance_variable_set(:"@data", {"KEY" => "VALUE"})
-      expect(instance.get_all).to eq("KEY" => "VALUE")
+  describe "#signed_s3_url" do
+    it "constructs a signed URL" do
+      config = {
+        'filename' => 'test.env',
+        'bucket_name' => 'example-bucket',
+        'access_key_id' => 'test_ACCESSKEYID',
+        'secret_access_key' => 'test_SECRETACCESSKEY',
+      }
+      adapter.instance_variable_set(:@_config, config)
+      signed_s3_url = adapter.send(:signed_s3_url)
+      signed_s3_uri = URI(signed_s3_url)
+      signed_s3_query_params = Rack::Utils.parse_nested_query(signed_s3_uri.query)
+      expect(signed_s3_uri.host).to eq('example-bucket.s3.amazonaws.com')
+      expect(signed_s3_uri.path).to eq('/test.env')
+      expect(signed_s3_query_params['AWSAccessKeyId']).to eq('test_ACCESSKEYID')
+      expect(signed_s3_query_params['Expires'].to_i).to be_between(Time.now.to_i + 60, Time.now.to_i + 300)
+      expect(signed_s3_query_params['Signature']).to_not be_nil
     end
-    it "returns @data" do
-      instance = Envoku::Adapters::S3.new
-      instance.instance_variable_set(:"@data", {})
-      expect(instance.get_all).to eq({})
-    end
-  end
-
-  describe "#get" do
-    it "returns @data[KEY]" do
-      instance = Envoku::Adapters::S3.new
-      instance.instance_variable_set(:"@data", {"KEY" => "VALUE"})
-      expect(instance.get("KEY")).to eq("VALUE")
-    end
-    it "returns nil" do
-      instance = Envoku::Adapters::S3.new
-      instance.instance_variable_set(:"@data", {"KEY" => "VALUE"})
-      expect(instance.get("KEY_2")).to eq(nil)
-    end
-  end
-
-  describe "#set" do
-    pending
   end
 end
