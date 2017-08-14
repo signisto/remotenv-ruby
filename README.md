@@ -1,7 +1,7 @@
 # Remotenv
 
 [![Gem Version](https://badge.fury.io/rb/remotenv.svg)](https://badge.fury.io/rb/remotenv)
-[![Circle CI](https://circleci.com/gh/signisto/remotenv-ruby/tree/master.svg?style=shield)](https://circleci.com/gh/signisto/remotenv-ruby/tree/master)
+[![Build Status](https://travis-ci.org/signisto/remotenv-ruby.svg?branch=master)](https://travis-ci.org/signisto/remotenv-ruby)
 [![Test Coverage](https://codeclimate.com/github/signisto/remotenv-ruby/badges/coverage.svg)](https://codeclimate.com/github/signisto/remotenv-ruby/coverage)
 [![Code Climate](https://codeclimate.com/github/signisto/remotenv-ruby/badges/gpa.svg)](https://codeclimate.com/github/signisto/remotenv-ruby)
 [![Issue Count](https://codeclimate.com/github/signisto/remotenv-ruby/badges/issue_count.svg)](https://codeclimate.com/github/signisto/remotenv-ruby)
