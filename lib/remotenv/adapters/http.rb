@@ -7,7 +7,7 @@ module Remotenv
   module Adapters
     class Http < Base
       def load
-        Remotenv.logger.debug("Downloading HTTP File: #{remote_uri.to_s}")
+        Remotenv.logger.debug("Downloading HTTP File: #{remote_uri}")
         download_file
       end
 
@@ -19,7 +19,7 @@ module Remotenv
 
       def download_file
         @content = http_get_content
-        Remotenv.logger.error("Error Downloading HTTP File: #{remote_uri.to_s}") unless @content
+        Remotenv.logger.error("Error Downloading HTTP File: #{remote_uri}") unless @content
       end
 
       def http_get_content

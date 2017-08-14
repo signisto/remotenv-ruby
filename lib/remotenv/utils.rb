@@ -15,7 +15,7 @@ module Remotenv
       parser = ::URI::RFC2396_Parser.new
       uri = parser.parse(parsed_url)
       uri
-    rescue Exception => error
+    rescue StandardError => error
       Remotenv.logger.error("URI Parse Error: URL = #{parsed_url || '[not set]'}")
       Remotenv.logger.error("  #{error.message}")
       (0..2).each do |index|

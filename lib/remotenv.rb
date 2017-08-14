@@ -22,7 +22,7 @@ module Remotenv
     @_uri ||= Remotenv::Utils.parsed_uri
   end
 
-  def load(options = {})
+  def load(*)
     return unless self.uri
     adapter = Remotenv::Adapters.for(self.uri)
     adapter.load!
