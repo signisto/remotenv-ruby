@@ -21,7 +21,7 @@ module Remotenv
             'bucket_name' => uri.host,
             'access_key_id' => uri.user,
             'secret_access_key' => uri.password ? ::URI.unescape(uri.password) : nil,
-          }.compact
+          }.reject { |_, v| v.nil? }
         end
       end
 
