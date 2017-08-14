@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Fixed
+
+- Support for ruby 2.3
+- Use TravisCI as test runner for multiple ruby releases
+
 
 ## [0.4.1] - 2017-07-07
 
